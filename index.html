@@ -193,6 +193,39 @@
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
     }
 
+    /* --- INÍCIO DAS REGRAS DE CSS (ABAS DO MODAL) --- */
+    .tab-content {
+        padding-top: 1rem;
+    }
+    .book-tabs .nav-link {
+        font-family: 'Cinzel', serif;
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: #6c757d; /* text-white-50 */
+        border: none;
+        border-bottom: 3px solid transparent;
+        background-color: transparent;
+        padding: 0.5rem 0;
+        margin-right: 1.5rem;
+        transition: color 0.3s ease, border-color 0.3s ease;
+    }
+    .book-tabs .nav-link:hover {
+        color: #E5E5E5;
+    }
+    .book-tabs .nav-link.active {
+        color: #B91C1C; /* text-epic-red */
+        border-bottom-color: #B91C1C;
+        background-color: transparent;
+    }
+    .pdf-viewer-tab {
+        width: 100%;
+        height: 100vh;
+        border: none;
+        border-radius: 0.5rem;
+    }
+    /* --- FIM DAS NOVAS REGRAS DE CSS --- */
+
+
     .modal-content {
         background-color: #1A1A1D; /* bg-level-2 */
         border-color: #333;
@@ -269,7 +302,7 @@
             <h1 class="display-1 fw-bold mb-4 text-shadow-custom">Sombras da Guerra</h1>
             <p class="fs-3 fw-light text-shadow-custom font-serif">Sangue do Império: Livro I</p>
             <button type="button" class="btn btn-light btn-lg mt-4 py-2 px-4 btn-ripple" data-bs-toggle="modal" data-bs-target="#modalSombrasDaGuerra">
-               Saiba mais +
+                Saiba mais +
             </button>
         </div>
     </section>
@@ -337,7 +370,9 @@
     </div>
 </footer>
 
-<!-- MODAL DO LIVRO "SOMBRAS DA GUERRA" --><div class="modal fade" id="modalSombrasDaGuerra" tabindex="-1" aria-labelledby="modalSombrasDaGuerraLabel" aria-hidden="true">
+<!-- MODAL DO LIVRO "SOMBRAS DA GUERRA" -->
+<!-- ATUALIZADO: Modal agora contém Abas (Tabs) -->
+<div class="modal fade" id="modalSombrasDaGuerra" tabindex="-1" aria-labelledby="modalSombrasDaGuerraLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content text-white">
             <div class="modal-header border-bottom border-secondary-subtle">
@@ -347,59 +382,87 @@
             <div class="modal-body">
                 <div class="container-fluid">
                     <div class="row g-4">
-                        <!-- Coluna da Capa e Tags --><div class="col-lg-3">
-                        <img src="assets/img/capa.png" class="img-fluid rounded-4 mb-3" alt="Capa Sombras da Guerra">
-                        <h6 class="font-serif text-white-50">Gêneros:</h6>
-                        <div>
-                            <span class="badge bg-danger bg-opacity-75 me-1 mb-1 fs-7 rounded-4">Fantasia</span>
-                            <span class="badge bg-danger bg-opacity-75 me-1 mb-1 fs-7 rounded-4">Alta Fantasia</span>
-                            <span class="badge bg-danger bg-opacity-75 me-1 mb-1 fs-7 rounded-4">Sombrio</span>
-                            <span class="badge bg-danger bg-opacity-75 me-1 mb-1 fs-7 rounded-4">Épico</span>
-                            <span class="badge bg-danger bg-opacity-75 me-1 mb-1 fs-7 rounded-4">Adulto</span>
-                            <span class="badge bg-danger bg-opacity-75 me-1 mb-1 fs-7 rounded-4">Guerra</span>
-                            <span class="badge bg-danger bg-opacity-75 me-1 mb-1 fs-7 rounded-4">Política</span>
-                        </div>
-
-                        <!-- NOVOS DETALHEiS DA EDIÇÃO --><div class="mt-4">
-                        <h6 class="font-serif text-white-50">Detalhes da Edição:</h6>
-                        <ul class="list-unstyled text-white-50" style="font-size: 0.95rem;">
-                            <li><strong>Edição:</strong> 1</li>
-                            <li><strong>Ano:</strong> 2025</li>
-                            <li><strong>Idioma:</strong> Português</li>
-                            <li><strong>Formato:</strong> 16x23 cm</li>
-                        </ul>
-                    </div>
-
-                        <!-- NOVO: Link da Editora no Modal -->
-                        <div class="mt-4">
-                            <h6 class="font-serif text-white-50">Editora:</h6>
-                            <a href="https://www.palavraeverso.com/" target="_blank" class="w-100 text-epic-red">
-                                Palavra & Verso
-                            </a>
-                        </div>
-                    </div>
-                        <div class="col-lg-9">
-                            <h3 class="font-serif text-epic-red mb-3">Sinopse</h3>
-                            <div class="fs-6 text-white-50">
-                                <p class="mb-2">
-                                    O sol se põe para o Império Méssio. O horizonte, um destino que deveria brilhar dourado, sangra. O trono, que um dia se fez colosso sobre terras distantes, hoje se parte. E seus pedaços caem, como lágrimas de pedra sobre as glórias que ele mesmo ergueu.
-                                    <br>
-                                    A lenda do Imperador Magno Bravo, herdeiro de um sangue ancestral, prometia-lhe um fim heroico em um campo de batalha; contudo, sangra lentamente, mutilado por inimigos invisíveis que sussurram veneno e escrevem maldições.
-                                    <br>
-                                    Distante do coração do império, Sally, uma aprendiz espiã marcada por um passado cruel, atravessa terras devastadas rumo a Sangueforte. Sua missão: entregar segredos capazes de virar a guerra ou sepultar de uma vez o império. Em uma jornada que revira as sombras do passado, se vê diante da crua realidade da guerra, onde a maldade humana vem à tona.
-                                    <br>
-                                    É o eterno jogo dos poderosos: a ambição de poucos, paga com o sangue de muitos. Reis e nobres movem suas peças no tabuleiro, sacrificando peões sem rosto em nome da honra e do legado. O que eles não percebem, em sua arrogância, é que a guerra deixou de ser o jogo. Agora, ela se move sozinha.
-                                    <br>
-                                    E a guerra é um titã cego. Seus pés não distinguem o lorde do servo, apenas nivelam o chão onde pisam. Bardos cantam sobre heróis, mas os campos estão cheios de garotos estripados, nobres e plebeus apodrecendo juntos na mesma lama, enquanto os corvos grasnam, agradecendo a fartura maldita.
-                                    <br>
-                                    E enquanto a terra dos homens se encharca de sangue, o medo, o desespero, a dor e a injustiça preparam um banquete sombrio… e nas sombras onde ninguém vê, uma fome antiga desperta para a ceia.
-                                </p>
+                        <!-- Coluna da Capa e Tags (FIXA) -->
+                        <div class="col-lg-3">
+                            <img src="assets/img/capa.png" class="img-fluid rounded-4 mb-3" alt="Capa Sombras da Guerra">
+                            <h6 class="font-serif text-white-50">Gêneros:</h6>
+                            <div>
+                                <span class="badge bg-danger bg-opacity-75 me-1 mb-1 fs-7 rounded-4">Fantasia</span>
+                                <span class="badge bg-danger bg-opacity-75 me-1 mb-1 fs-7 rounded-4">Alta Fantasia</span>
+                                <span class="badge bg-danger bg-opacity-75 me-1 mb-1 fs-7 rounded-4">Sombrio</span>
+                                <span class="badge bg-danger bg-opacity-75 me-1 mb-1 fs-7 rounded-4">Épico</span>
+                                <span class="badge bg-danger bg-opacity-75 me-1 mb-1 fs-7 rounded-4">Adulto</span>
+                                <span class="badge bg-danger bg-opacity-75 me-1 mb-1 fs-7 rounded-4">Guerra</span>
+                                <span class="badge bg-danger bg-opacity-75 me-1 mb-1 fs-7 rounded-4">Política</span>
                             </div>
-                            <div class="text-center pt-5">
-                                <a href="https://form.jotform.com/252955345094060" target="_blank" class="btn py-3 px-4 btn-light btn-ripple">
-                                    Deixar sua Avaliação
+
+                            <!-- NOVOS DETALHEiS DA EDIÇÃO -->
+                            <div class="mt-4">
+                                <h6 class="font-serif text-white-50">Detalhes da Edição:</h6>
+                                <ul class="list-unstyled text-white-50" style="font-size: 0.95rem;">
+                                    <li><strong>Edição:</strong> 1</li>
+                                    <li><strong>Ano:</strong> 2025</li>
+                                    <li><strong>Idioma:</strong> Português</li>
+                                    <li><strong>Formato:</strong> 16x23 cm</li>
+                                </ul>
+                            </div>
+
+                            <!-- NOVO: Link da Editora no Modal -->
+                            <div class="mt-4">
+                                <h6 class="font-serif text-white-50">Editora:</h6>
+                                <a href="https://www.palavraeverso.com/" target="_blank" class="w-100 text-epic-red">
+                                    Palavra & Verso
                                 </a>
-                                <a href="https://palavraeverso.lojaintegrada.com.br/sombras-da-guerra-m-h-formagini-pre-venda" target="_blank" class="btn btn-red btn-ripple py-3 px-4">Comprar Agora</a>
+                            </div>
+                        </div>
+
+                        <!-- Coluna da Direita (COM ABAS) -->
+                        <div class="col-lg-9">
+
+                            <!-- Estrutura de Abas -->
+                            <ul class="nav nav-tabs book-tabs border-bottom border-epic-red shadow-none" id="bookDetailsTab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="tab-sinopse-link" data-bs-toggle="tab" data-bs-target="#tab-sinopse-content" type="button" role="tab" aria-controls="tab-sinopse-content" aria-selected="true">Sinopse</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="tab-amostra-link" data-bs-toggle="tab" data-bs-target="#tab-amostra-content" type="button" role="tab" aria-controls="tab-amostra-content" aria-selected="false">Amostra</button>
+                                </li>
+                            </ul>
+                            <div class="tab-content pt-0 border border-epic-red rounded-bottom" id="bookDetailsTabContent">
+                                <div class="tab-pane p-3 fade show active" id="tab-sinopse-content" role="tabpanel" aria-labelledby="tab-sinopse-link">
+                                    <div class="fs-6 text-white-50"> <!-- pt-3 para espaço -->
+                                        <p class="mb-2">
+                                            O sol se põe para o Império Méssio. O horizonte, um destino que deveria brilhar dourado, sangra. O trono, que um dia se fez colosso sobre terras distantes, hoje se parte. E seus pedaços caem, como lágrimas de pedra sobre as glórias que ele mesmo ergueu.
+                                            <br>
+                                            A lenda do Imperador Magno Bravo, herdeiro de um sangue ancestral, prometia-lhe um fim heroico em um campo de batalha; contudo, sangra lentamente, mutilado por inimigos invisíveis que sussurram veneno e escrevem maldições.
+                                            <br>
+                                            Distante do coração do império, Sally, uma aprendiz espiã marcada por um passado cruel, atravessa terras devastadas rumo a Sangueforte. Sua missão: entregar segredos capazes de virar a guerra ou sepultar de uma vez o império. Em uma jornada que revira as sombras do passado, se vê diante da crua realidade da guerra, onde a maldade humana vem à tona.
+                                            <br>
+                                            É o eterno jogo dos poderosos: a ambição de poucos, paga com o sangue de muitos. Reis e nobres movem suas peças no tabuleiro, sacrificando peões sem rosto em nome da honra e do legado. O que eles não percebem, em sua arrogância, é que a guerra deixou de ser o jogo. Agora, ela se move sozinha.
+                                            <br>
+                                            E a guerra é um titã cego. Seus pés não distinguem o lorde do servo, apenas nivelam o chão onde pisam. Bardos cantam sobre heróis, mas os campos estão cheios de garotos estripados, nobres e plebeus apodrecendo juntos na mesma lama, enquanto os corvos grasnam, agradecendo a fartura maldita.
+                                            <br>
+                                            E enquanto a terra dos homens se encharca de sangue, o medo, o desespero, a dor e a injustiça preparam um banquete sombrio… e nas sombras onde ninguém vê, uma fome antiga desperta para a ceia.
+                                        </p>
+                                    </div>
+                                    <div class="text-center pt-5">
+                                        <a href="https://form.jotform.com/252955345094060" target="_blank" class="btn py-3 px-4 btn-light btn-ripple">
+                                            Deixar sua Avaliação
+                                        </a>
+                                        <a href="https://palavraeverso.lojaintegrada.com.br/sombras-da-guerra-m-h-formagini-pre-venda" target="_blank" class="btn btn-red btn-ripple py-3 px-4">Comprar Agora</a>
+                                    </div>
+                                </div>
+                                <div class="tab-pane px-1 pt-1 pb-3 fade" id="tab-amostra-content" role="tabpanel" aria-labelledby="tab-amostra-link">
+                                    <iframe src="assets/docs/sdg_amostra.pdf" class="pdf-viewer-tab" title="Amostra do livro Sombras da Guerra">
+                                        Seu navegador não suporta iFrames. <a href="assets/docs/sdg_amostra.pdf" target="_blank">Baixe a amostra aqui</a>.
+                                    </iframe>
+                                    <div class="text-center pt-4">
+                                        <h5 class="font-serif mb-3">Gostou da amostra?</h5>
+                                        <a href="https://palavraeverso.lojaintegrada.com.br/sombras-da-guerra-m-h-formagini-pre-venda" target="_blank" class="btn btn-red btn-lg btn-ripple py-3 px-4">
+                                            Comprar Agora
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -408,6 +471,9 @@
         </div>
     </div>
 </div>
+<!-- FIM DO MODAL DE DETALHES -->
+
+<!-- MODAL PDF FULLSCREEN (REMOVIDO) -->
 
 
 <!-- Bootstrap JS Bundle (v5.3.8 - Mais Recente) -->
@@ -461,8 +527,8 @@
         });
     });
 </script>
-<script src='https://cdn.jotfor.ms/agent/embedjs/019a12423645701093f41695a1a939e5a70a/embed.js'></script>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9448026833307716"
+<script src='https://cdn.jotfor.ms/agent/embedjs/019a1245701093f41695a1a939e5a70a/embed.js'></script>
+<script async src="https://pagead2.googlesyndication.com/pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9448026833307716"
         crossorigin="anonymous"></script>
 </body>
 </html>
