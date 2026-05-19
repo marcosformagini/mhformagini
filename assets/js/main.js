@@ -331,3 +331,87 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+
+
+// ===== FAQ DEEP SPACE PARTICLES =====
+(function() {
+    const faqCanvas = document.getElementById('faq-canvas');
+    if (!faqCanvas) return;
+    const faqCtx = faqCanvas.getContext('2d');
+    const faqSection = faqCanvas.parentElement;
+    let faqParticles = [];
+
+    function resizeFaqCanvas() {
+        faqCanvas.width = faqSection.offsetWidth;
+        faqCanvas.height = faqSection.offsetHeight;
+    }
+
+    function initFaqParticles() {
+        resizeFaqCanvas();
+        faqParticles = [];
+        const count = Math.floor((faqCanvas.width * faqCanvas.height) / 3000);
+        for (let i = 0; i < count; i++) {
+            faqParticles.push({
+                x: Math.random() * faqCanvas.width,
+                y: Math.random() * faqCanvas.height,
+                size: Math.random() * 2.5 + 0.3,
+                opacity: Math.random() * 0.5,
+                fadeSpeed: Math.random() * 0.008 + 0.002,
+                fadeDir: Math.random() > 0.5 ? 1 : -1,
+                maxOpacity: Math.random() * 0.5 + 0.2,
+                isSilver: Math.random() > 0.6
+            });
+        }
+    }
+
+    function animateFaqParticles() {
+        faqCtx.clearRect(0, 0, faqCanvas.width, faqCanvas.height);
+
+        faqParticles.forEach(p => {
+            p.opacity += p.fadeDir * p.fadeSpeed;
+            if (p.opacity >= p.maxOpacity) p.fadeDir = -1;
+            if (p.opacity <= 0) p.fadeDir = 1;
+
+            const r = p.isSilver ? 192 : 201;
+            const g = p.isSilver ? 192 : 168;
+            const b = p.isSilver ? 192 : 76;
+
+            faqCtx.beginPath();
+            faqCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            faqCtx.fillStyle = `rgba(${r}, ${g}, ${b}, ${p.opacity})`;
+            faqCtx.fill();
+        });
+
+        requestAnimationFrame(animateFaqParticles);
+    }
+
+    window.addEventListener('resize', initFaqParticles);
+    initFaqParticles();
+    animateFaqParticles();
+})();
+
+
+// ===== FAQ FOCUS EFFECT =====
+(function() {
+    const faqItems = document.querySelectorAll('#faqAccordion .accordion-item');
+    if (!faqItems.length) return;
+
+    document.getElementById('faqAccordion').addEventListener('show.bs.collapse', (e) => {
+        const openItem = e.target.closest('.accordion-item');
+        faqItems.forEach(item => {
+            if (item === openItem) {
+                item.classList.add('faq-active');
+                item.classList.remove('faq-blur');
+            } else {
+                item.classList.add('faq-blur');
+                item.classList.remove('faq-active');
+            }
+        });
+    });
+
+    document.getElementById('faqAccordion').addEventListener('hidden.bs.collapse', () => {
+        faqItems.forEach(item => {
+            item.classList.remove('faq-blur', 'faq-active');
+        });
+    });
+})();
