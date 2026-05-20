@@ -333,6 +333,54 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
+// ===== NAVBAR TYPEWRITER EFFECT =====
+(function() {
+    var el = document.getElementById('navbar-typewriter');
+    if (!el) return;
+    var text = 'M. H. Formagini';
+    var typeSpeed = 100;
+    var deleteSpeed = 60;
+    var pauseAfterType = 3000;
+    var pauseAfterDelete = 500;
+
+    var fonts = [
+        "'Special Elite', cursive",
+        "'Times New Roman', Times, serif",
+        "'Cinzel', serif",
+        "'Playfair Display', serif",
+        "'IM Fell English', serif"
+    ];
+    var fontIndex = 0;
+
+    function setFont() {
+        el.style.fontFamily = fonts[fontIndex];
+    }
+
+    function typeText(i) {
+        if (i <= text.length) {
+            el.textContent = text.substring(0, i);
+            setTimeout(function() { typeText(i + 1); }, typeSpeed);
+        } else {
+            setTimeout(deleteText, pauseAfterType);
+        }
+    }
+
+    function deleteText() {
+        var len = el.textContent.length;
+        if (len > 0) {
+            el.textContent = text.substring(0, len - 1);
+            setTimeout(deleteText, deleteSpeed);
+        } else {
+            fontIndex = (fontIndex + 1) % fonts.length;
+            setFont();
+            setTimeout(function() { typeText(0); }, pauseAfterDelete);
+        }
+    }
+
+    setFont();
+    typeText(0);
+})();
+
 // ===== FAQ DEEP SPACE PARTICLES =====
 (function() {
     const faqCanvas = document.getElementById('faq-canvas');

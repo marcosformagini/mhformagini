@@ -68,6 +68,33 @@ h1, h2, h3, h4, h5, h6 {
     letter-spacing: 1px;
 }
 
+.navbar-logo {
+    height: 30px;
+    width: auto;
+    filter: invert(1);
+    transition: opacity 0.3s ease;
+}
+
+.navbar-logo:hover {
+    opacity: 0.8;
+}
+
+.navbar-typewriter {
+    color: var(--gold);
+    font-weight: 700;
+    font-size: 1.4rem;
+    letter-spacing: 1px;
+    border-right: 2px solid var(--gold);
+    padding-right: 3px;
+    animation: blink-caret 0.8s step-end infinite;
+    white-space: nowrap;
+}
+
+@keyframes blink-caret {
+    0%, 100% { border-color: var(--gold); }
+    50% { border-color: transparent; }
+}
+
 .navbar-custom .nav-link {
     color: var(--text-secondary);
     font-family: 'Inter', sans-serif;
@@ -131,11 +158,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .hero-content::before {
-    content: 'I';
+    content: none;
+}
+
+.hero-roman-numeral {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%) scale(1);
     font-family: 'Cinzel', serif;
     font-size: clamp(25rem, 50vw, 45rem);
     font-weight: 900;
@@ -147,24 +177,30 @@ h1, h2, h3, h4, h5, h6 {
     text-shadow: 0 0 60px rgba(192, 192, 192, 0.03);
     opacity: 0;
     animation: iReveal 3s ease forwards 1.5s;
+    transition: filter 0.8s ease, text-shadow 0.8s ease, color 0.8s ease, transform 0.8s ease;
+}
+
+.hero-content:hover .hero-roman-numeral {
+    filter: blur(35px);
+    color: rgba(192, 192, 192, 0.14);
+    text-shadow: 0 0 150px rgba(192, 192, 192, 0.3), 0 0 80px rgba(201, 168, 76, 0.15);
+    transform: translate(-50%, -50%) scale(1.2);
 }
 
 @keyframes iReveal {
     0% {
         opacity: 0;
         transform: translate(-50%, -50%) scale(0.5);
-        filter: blur(20px);
+        text-shadow: 0 0 0 transparent;
     }
     50% {
         opacity: 1;
         transform: translate(-50%, -50%) scale(1.05);
-        filter: blur(5px);
         text-shadow: 0 0 80px rgba(192, 192, 192, 0.15);
     }
     100% {
         opacity: 1;
         transform: translate(-50%, -50%) scale(1);
-        filter: blur(0);
         text-shadow: 0 0 60px rgba(192, 192, 192, 0.03);
     }
 }
@@ -601,6 +637,13 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 0.95rem;
 }
 
+.footer-logo {
+    filter: invert(1) brightness(2);
+    opacity: 0.9;
+    max-height: 40px;
+    margin-bottom: 0.8rem;
+}
+
 /* ===== ANIMATIONS ===== */
 @keyframes revealUp {
     to {
@@ -1014,7 +1057,7 @@ h1, h2, h3, h4, h5, h6 {
         cursor: zoom-in;
     }
 
-    .hero-content::before {
+    .hero-roman-numeral {
         font-size: 45rem;
     }
 }
