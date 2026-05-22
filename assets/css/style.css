@@ -177,15 +177,9 @@ h1, h2, h3, h4, h5, h6 {
     text-shadow: 0 0 60px rgba(192, 192, 192, 0.03);
     opacity: 0;
     animation: iReveal 3s ease forwards 1.5s;
-    transition: filter 0.8s ease, text-shadow 0.8s ease, color 0.8s ease, transform 0.8s ease;
 }
 
-.hero-content:hover .hero-roman-numeral {
-    filter: blur(35px);
-    color: rgba(192, 192, 192, 0.14);
-    text-shadow: 0 0 150px rgba(192, 192, 192, 0.3), 0 0 80px rgba(201, 168, 76, 0.15);
-    transform: translate(-50%, -50%) scale(1.2);
-}
+
 
 @keyframes iReveal {
     0% {
