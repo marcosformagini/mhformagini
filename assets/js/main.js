@@ -1,465 +1,508 @@
-const canvas = document.getElementById('particles-canvas');
-const ctx = canvas.getContext('2d');
-let particles = [];
-let animationId;
+/* ============================================================
+   M. H. Formagini — main.js  (Dark Glass Fantasy)
+   Sem dependências externas.
+   ============================================================ */
+'use strict';
 
-function resizeCanvas() {
-    const parent = canvas.parentElement;
-    canvas.width = parent.offsetWidth;
-    canvas.height = parent.offsetHeight;
-}
+/* ─────────────────────────────────────────
+   LOADING SCREEN — Quill & Scroll Loop
+───────────────────────────────────────── */
+(function () {
+    const screen = document.getElementById('loading-screen');
+    if (!screen) return;
 
-class Particle {
-    constructor(type) {
-        this.type = type || 'normal';
-        this.reset();
-    }
+    const icons = screen.querySelectorAll('.loading-icon');
+    if (!icons.length) return;
 
-    reset() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.speedX = (Math.random() - 0.5) * 0.2;
-        this.speedY = (Math.random() - 0.5) * 0.2;
-        this.fadeDirection = Math.random() > 0.5 ? 1 : -1;
-        this.isSilver = Math.random() > 0.6;
+    let current = 0;
+    let looping = true;
 
-        if (this.type === 'glow') {
-            this.size = Math.random() * 4 + 2;
-            this.opacity = Math.random() * 0.2 + 0.05;
-            this.fadeSpeed = Math.random() * 0.003 + 0.001;
-            this.maxOpacity = 0.3;
-        } else if (this.type === 'drift') {
-            this.size = Math.random() * 1.5 + 0.3;
-            this.opacity = Math.random() * 0.6 + 0.1;
-            this.fadeSpeed = Math.random() * 0.008 + 0.003;
-            this.maxOpacity = 0.7;
-            this.angle = Math.random() * Math.PI * 2;
-            this.angleSpeed = (Math.random() - 0.5) * 0.01;
-            this.radius = Math.random() * 30 + 10;
-            this.centerX = this.x;
-            this.centerY = this.y;
-        } else {
-            this.size = Math.random() * 2 + 0.5;
-            this.opacity = Math.random() * 0.5 + 0.1;
-            this.fadeSpeed = Math.random() * 0.005 + 0.002;
-            this.maxOpacity = 0.6;
-        }
-    }
-
-    update() {
-        if (this.type === 'drift') {
-            this.angle += this.angleSpeed;
-            this.x = this.centerX + Math.cos(this.angle) * this.radius;
-            this.y = this.centerY + Math.sin(this.angle) * this.radius;
-            this.centerX += this.speedX * 0.3;
-            this.centerY += this.speedY * 0.3;
-        } else {
-            this.x += this.speedX;
-            this.y += this.speedY;
-        }
-
-        this.opacity += this.fadeDirection * this.fadeSpeed;
-        if (this.opacity >= this.maxOpacity) this.fadeDirection = -1;
-        if (this.opacity <= 0.02) this.fadeDirection = 1;
-
-        if (this.x < -50 || this.x > canvas.width + 50 || this.y < -50 || this.y > canvas.height + 50) {
-            this.reset();
-        }
-    }
-
-    draw() {
-        ctx.beginPath();
-        if (this.type === 'glow') {
-            const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
-            if (this.isSilver) {
-                gradient.addColorStop(0, `rgba(220, 220, 230, ${this.opacity})`);
-                gradient.addColorStop(1, `rgba(192, 192, 192, 0)`);
-            } else {
-                gradient.addColorStop(0, `rgba(232, 212, 139, ${this.opacity})`);
-                gradient.addColorStop(1, `rgba(201, 168, 76, 0)`);
-            }
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fillStyle = gradient;
-        } else {
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            if (this.isSilver) {
-                ctx.fillStyle = `rgba(192, 192, 192, ${this.opacity * 0.7})`;
-            } else {
-                ctx.fillStyle = `rgba(201, 168, 76, ${this.opacity})`;
-            }
-        }
-        ctx.fill();
-    }
-}
-
-function initParticles() {
-    particles = [];
-    const area = canvas.width * canvas.height;
-    const normalCount = Math.min(60, Math.floor(area / 18000));
-    const glowCount = Math.min(20, Math.floor(area / 50000));
-    const driftCount = Math.min(15, Math.floor(area / 60000));
-
-    for (let i = 0; i < normalCount; i++) particles.push(new Particle('normal'));
-    for (let i = 0; i < glowCount; i++) particles.push(new Particle('glow'));
-    for (let i = 0; i < driftCount; i++) particles.push(new Particle('drift'));
-}
-
-function animateParticles() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    particles.forEach(p => {
-        p.update();
-        p.draw();
-    });
-    animationId = requestAnimationFrame(animateParticles);
-}
-
-window.addEventListener('resize', () => {
-    resizeCanvas();
-    initParticles();
-});
-
-resizeCanvas();
-initParticles();
-animateParticles();
-
-// ===== SCROLL REVEAL ANIMATION =====
-const revealElements = document.querySelectorAll('.reveal');
-const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('active');
-            revealObserver.unobserve(entry.target);
-        }
-    });
-}, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
-
-revealElements.forEach(el => revealObserver.observe(el));
-
-// ===== NAVBAR SCROLL EFFECT =====
-const navbar = document.querySelector('.navbar-custom');
-
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-        navbar.style.borderBottomColor = 'rgba(201, 168, 76, 0.2)';
-    } else {
-        navbar.style.borderBottomColor = 'rgba(201, 168, 76, 0.1)';
-    }
-});
-
-// ===== SCROLLSPY INIT =====
-document.addEventListener('DOMContentLoaded', () => {
-    // Smooth scroll ao clicar nos links da navbar
-    const navLinks = document.querySelectorAll('.navbar-nav .nav-link[href^="#"]');
-
-    navLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const targetId = link.getAttribute('href');
-            const target = document.querySelector(targetId);
-            if (target) {
-                const offset = 70;
-                const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
-                window.scrollTo({ top, behavior: 'smooth' });
-            }
-            // Fechar menu mobile se aberto
-            const navCollapse = document.querySelector('#navContent');
-            if (navCollapse.classList.contains('show')) {
-                new bootstrap.Collapse(navCollapse).hide();
-            }
+    // Calcular dash lengths reais para cada path/line
+    icons.forEach(svg => {
+        svg.querySelectorAll('path, line').forEach(el => {
+            const len = el.getTotalLength ? el.getTotalLength() : 200;
+            el.style.setProperty('--dash-length', len);
         });
     });
 
-    // Custom ScrollSpy com IntersectionObserver
-    const sections = document.querySelectorAll('section[id]');
-    const observerOptions = {
-        root: null,
-        rootMargin: '-20% 0px -60% 0px',
-        threshold: 0
-    };
+    function showIcon(index) {
+        if (!looping) return;
+        const icon = icons[index];
 
-    const scrollObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const id = entry.target.getAttribute('id');
-                navLinks.forEach(link => {
-                    link.classList.remove('active');
-                    if (link.getAttribute('href') === '#' + id) {
-                        link.classList.add('active');
-                    }
+        // Reset strokes for re-draw
+        icon.querySelectorAll('path, line').forEach(el => {
+            el.style.animation = 'none';
+            el.offsetHeight; // force reflow
+            el.style.animation = '';
+        });
+
+        // Appear
+        icon.classList.remove('fading');
+        icon.classList.add('visible');
+
+        // Trigger draw after a frame (allows reflow)
+        requestAnimationFrame(() => {
+            icon.classList.add('drawing');
+        });
+
+        // Hold, then fade
+        const drawTime = 1400;
+        const holdTime = 600;
+        const fadeTime = 500;
+
+        setTimeout(() => {
+            if (!looping) return;
+            icon.classList.add('fading');
+            icon.classList.remove('visible');
+
+            setTimeout(() => {
+                icon.classList.remove('drawing', 'fading');
+                // Next icon
+                current = (current + 1) % icons.length;
+                if (looping) showIcon(current);
+            }, fadeTime);
+        }, drawTime + holdTime);
+    }
+
+    // Start the loop
+    showIcon(0);
+
+    // Fade out after page load
+    window.addEventListener('load', () => {
+        // Espera o ciclo atual terminar suavemente
+        setTimeout(() => {
+            looping = false;
+            screen.classList.add('fade-out');
+            setTimeout(() => screen.remove(), 950);
+        }, 600);
+    });
+})();
+
+/* ─────────────────────────────────────────
+   FLOATING NAV
+───────────────────────────────────────── */
+(function () {
+    const navbar     = document.getElementById('mainNavbar');
+    const toggle     = document.getElementById('navToggle');
+    if (!navbar) return;
+
+    // Mostra nav flutuante após scrollar 80% do hero
+    const hero = document.getElementById('home');
+    const showThreshold = hero ? hero.offsetHeight * 0.8 : 400;
+
+    function onScroll() {
+        const past = window.scrollY > showThreshold;
+        navbar.classList.toggle('visible', past);
+        if (toggle) toggle.classList.toggle('visible', past);
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    // Mobile toggle
+    if (toggle) {
+        toggle.addEventListener('click', () => {
+            const isOpen = navbar.classList.toggle('menu-open');
+            toggle.classList.toggle('open', isOpen);
+            toggle.setAttribute('aria-expanded', String(isOpen));
+        });
+        document.addEventListener('click', e => {
+            if (!navbar.contains(e.target) && !toggle.contains(e.target)) {
+                navbar.classList.remove('menu-open');
+                toggle.classList.remove('open');
+                toggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+
+    // Smooth scroll
+    document.querySelectorAll('.nav-link[href^="#"]').forEach(link => {
+        link.addEventListener('click', e => {
+            e.preventDefault();
+            const target = document.querySelector(link.getAttribute('href'));
+            if (!target) return;
+            window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 40, behavior: 'smooth' });
+            navbar.classList.remove('menu-open');
+            if (toggle) toggle.classList.remove('open');
+        });
+    });
+
+    // ScrollSpy
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-link');
+    const spy = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                const id = e.target.id;
+                navLinks.forEach(l => {
+                    l.classList.toggle('active', l.getAttribute('href') === '#' + id);
                 });
             }
         });
-    }, observerOptions);
+    }, { rootMargin: '-25% 0px -60% 0px', threshold: 0 });
+    sections.forEach(s => spy.observe(s));
+})();
 
-    sections.forEach(section => scrollObserver.observe(section));
+/* (brand está dentro do nav flutuante — sem animação JS necessária) */
 
-    // ===== HERO SAGA — EMBER IGNITION =====
-    const sagaEl = document.getElementById('hero-saga');
-    if (sagaEl) {
-        const text = sagaEl.textContent;
-        sagaEl.innerHTML = '';
-        const chars = [];
-        for (let i = 0; i < text.length; i++) {
-            const span = document.createElement('span');
-            span.textContent = text[i];
-            span.classList.add('char');
-            sagaEl.appendChild(span);
-            if (text[i].trim()) chars.push(span);
-        }
+/* ─────────────────────────────────────────
+   SCROLL REVEAL
+───────────────────────────────────────── */
+(function () {
+    const els = document.querySelectorAll('.reveal');
+    if (!els.length) return;
+    const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                e.target.classList.add('active');
+                obs.unobserve(e.target);
+            }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    els.forEach(el => obs.observe(el));
 
-        // Start ignition after reveal animation completes
+    // Hero elements revelados via classe própria no DOM load
+    document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
-            let litCount = 0;
-            const total = chars.length;
-            const ignition = setInterval(() => {
-                const unlit = chars.filter(c => !c.classList.contains('lit'));
-                if (unlit.length === 0) {
-                    clearInterval(ignition);
-                    return;
-                }
-                // Light 1-2 random chars per tick
-                const burst = Math.min(Math.floor(Math.random() * 2) + 1, unlit.length);
-                for (let i = 0; i < burst; i++) {
-                    const pick = unlit[Math.floor(Math.random() * unlit.length)];
-                    pick.classList.add('lit');
-                    // Remove from unlit pool
-                    const idx = unlit.indexOf(pick);
-                    if (idx > -1) unlit.splice(idx, 1);
-                }
-            }, 120);
-        }, 1800);
-    }
-
-    // ===== UNIVERSE MAPS — NAVIGATION =====
-    const mapSlides = document.querySelectorAll('.universe-map-slide');
-    const mapBtns = document.querySelectorAll('.universe-map-btn');
-    const hotspot = document.getElementById('hotspot-messio');
-
-    function showMap(mapId) {
-        mapSlides.forEach(slide => {
-            slide.classList.remove('active');
-            if (slide.id === mapId) {
-                slide.classList.add('active');
-            }
-        });
-        mapBtns.forEach(btn => {
-            btn.classList.remove('active');
-            if (btn.dataset.map === mapId) {
-                btn.classList.add('active');
-            }
-        });
-    }
-
-    mapBtns.forEach(btn => {
-        btn.addEventListener('click', () => showMap(btn.dataset.map));
+            document.querySelectorAll('.hero-eyebrow, .hero-title, .hero-sub, .hero-divider, .hero-desc, .hero-actions, .hero-circle-wrap').forEach((el, i) => {
+                setTimeout(() => el.classList.add('active'), i * 120);
+            });
+        }, 200);
     });
+})();
 
-    if (hotspot) {
-        hotspot.addEventListener('click', () => showMap('map-messio'));
+/* ─────────────────────────────────────────
+   HERO — EMBER PARTICLES
+───────────────────────────────────────── */
+(function () {
+    const cv = document.getElementById('hero-ember-canvas');
+    if (!cv) return;
+    const ctx = cv.getContext('2d');
+    let embers = [];
+
+    function resize() {
+        const hero = document.getElementById('home');
+        if (!hero) return;
+        cv.width  = hero.offsetWidth;
+        cv.height = hero.offsetHeight;
     }
 
-    // ===== UNIVERSE MAPS — MAGNIFYING LENS (desktop) & LIGHTBOX (mobile) =====
-    const isMobile = window.matchMedia('(max-width: 768px)').matches;
-    const ZOOM = 3;
-    const LENS_SIZE = 600;
-
-    // Lightbox for mobile
-    if (isMobile) {
-        const lightbox = document.createElement('div');
-        lightbox.id = 'map-lightbox';
-        lightbox.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(10,10,15,0.95);display:none;align-items:center;justify-content:center;padding:1rem;';
-        lightbox.innerHTML = '<img style="max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;" alt="Mapa expandido"><div style="position:absolute;top:1rem;right:1.5rem;color:var(--gold);font-size:2rem;cursor:pointer;z-index:10;">&times;</div>';
-        document.body.appendChild(lightbox);
-
-        const lightboxImg = lightbox.querySelector('img');
-        const lightboxClose = lightbox.querySelector('div');
-
-        lightboxClose.addEventListener('click', () => { lightbox.style.display = 'none'; });
-        lightbox.addEventListener('click', (e) => { if (e.target === lightbox) lightbox.style.display = 'none'; });
-
-        document.querySelectorAll('.universe-map-img').forEach(img => {
-            img.addEventListener('click', () => {
-                lightboxImg.src = img.src;
-                lightbox.style.display = 'flex';
-            });
-        });
-    } else {
-        // Lens for desktop
-        document.querySelectorAll('.universe-map-wrapper').forEach(wrapper => {
-            const img = wrapper.querySelector('.universe-map-img');
-            const lens = wrapper.querySelector('.universe-map-lens');
-            if (!img || !lens) return;
-
-            wrapper.addEventListener('mouseenter', () => {
-                lens.classList.add('active');
-            });
-
-            wrapper.addEventListener('mouseleave', () => {
-                lens.classList.remove('active');
-            });
-
-            wrapper.addEventListener('mousemove', (e) => {
-                const rect = wrapper.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-
-                // Position lens centered on cursor
-                lens.style.left = (x - LENS_SIZE / 2) + 'px';
-                lens.style.top = (y - LENS_SIZE / 2) + 'px';
-
-                // Calculate background position for zoom
-                const displayWidth = img.offsetWidth;
-                const displayHeight = img.offsetHeight;
-
-                // Percentage position of cursor on the image
-                const percX = x / displayWidth;
-                const percY = y / displayHeight;
-
-                // Background size = image zoomed
-                const bgWidth = displayWidth * ZOOM;
-                const bgHeight = displayHeight * ZOOM;
-
-                // Background position to center the zoomed area under the lens
-                const bgX = -(percX * bgWidth - LENS_SIZE / 2);
-                const bgY = -(percY * bgHeight - LENS_SIZE / 2);
-
-                lens.style.backgroundImage = `url('${img.src}')`;
-                lens.style.backgroundSize = `${bgWidth}px ${bgHeight}px`;
-                lens.style.backgroundPosition = `${bgX}px ${bgY}px`;
-            });
-        });
+    class Ember {
+        constructor(scattered) { this.init(scattered); }
+        init(scattered) {
+            this.x       = Math.random() * cv.width;
+            this.y       = scattered ? Math.random() * cv.height : cv.height + 10;
+            this.vx      = (Math.random() - 0.5) * 0.3;
+            this.vy      = -(Math.random() * 0.65 + 0.2);
+            this.size    = Math.random() * 2 + 0.3;
+            this.base    = Math.random() * 0.5 + 0.08;
+            this.life    = scattered ? Math.random() : 1;
+            this.decay   = Math.random() * 0.0022 + 0.0007;
+            this.wobble  = Math.random() * Math.PI * 2;
+            this.wSpeed  = Math.random() * 0.022 + 0.007;
+            this.isGold  = Math.random() > 0.38;
+        }
+        update() {
+            this.wobble += this.wSpeed;
+            this.x += this.vx + Math.sin(this.wobble) * 0.25;
+            this.y += this.vy;
+            this.life -= this.decay;
+            if (this.life <= 0 || this.y < -10) this.init(false);
+        }
+        draw() {
+            const a = this.life * this.base;
+            if (a < 0.01) return;
+            const [r, g, b] = this.isGold ? [210, 155, 58] : [192, 192, 200];
+            const gr = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 2.5);
+            gr.addColorStop(0, `rgba(${r},${g},${b},${a})`);
+            gr.addColorStop(1, `rgba(${r},${g},${b},0)`);
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size * 2.5, 0, Math.PI * 2);
+            ctx.fillStyle = gr;
+            ctx.fill();
+        }
     }
-});
 
+    function init() {
+        resize();
+        const n = Math.min(80, Math.floor((cv.width * cv.height) / 13000));
+        embers = Array.from({ length: n }, () => new Ember(true));
+    }
+    function loop() {
+        ctx.clearRect(0, 0, cv.width, cv.height);
+        embers.forEach(e => { e.update(); e.draw(); });
+        requestAnimationFrame(loop);
+    }
+    window.addEventListener('resize', init, { passive: true });
+    init(); loop();
+})();
 
+/* ─────────────────────────────────────────
+   HERO — FOG PARALLAX
+───────────────────────────────────────── */
+(function () {
+    const hero    = document.getElementById('home');
+    if (!hero) return;
+    const fog1    = hero.querySelector('.hero-fog-1');
+    const fog2    = hero.querySelector('.hero-fog-2');
+    const content = hero.querySelector('.hero-inner');
+    if (!fog1 || !fog2) return;
 
-// ===== NAVBAR TYPEWRITER EFFECT =====
-(function() {
-    var el = document.getElementById('navbar-typewriter');
+    let tx = 0, ty = 0, cx = 0, cy = 0;
+    hero.addEventListener('mousemove', e => {
+        const r = hero.getBoundingClientRect();
+        tx = (e.clientX - r.left) / r.width  - 0.5;
+        ty = (e.clientY - r.top)  / r.height - 0.5;
+    }, { passive: true });
+    hero.addEventListener('mouseleave', () => { tx = 0; ty = 0; }, { passive: true });
+
+    (function tick() {
+        cx += (tx - cx) * 0.05;
+        cy += (ty - cy) * 0.05;
+        fog1.style.transform    = `translate(${cx * -16}px,${cy * -10}px) scale(1.04)`;
+        fog2.style.transform    = `translate(${cx *  10}px,${cy *  7}px) scale(1.03)`;
+        if (content) content.style.transform = `translate(${cx * 5}px,${cy * 3}px)`;
+        requestAnimationFrame(tick);
+    })();
+})();
+
+/* ─────────────────────────────────────────
+   HERO — SAGA IGNITION (chars dourados)
+───────────────────────────────────────── */
+(function () {
+    const el = document.getElementById('hero-saga');
     if (!el) return;
-    var text = 'M. H. Formagini';
-    var typeSpeed = 100;
-    var deleteSpeed = 60;
-    var pauseAfterType = 3000;
-    var pauseAfterDelete = 500;
-
-    var fonts = [
-        "'Special Elite', cursive",
-        "'Times New Roman', Times, serif",
-        "'Cinzel', serif",
-        "'Playfair Display', serif",
-        "'IM Fell English', serif"
-    ];
-    var fontIndex = 0;
-
-    function setFont() {
-        el.style.fontFamily = fonts[fontIndex];
+    const text = el.textContent;
+    el.innerHTML = '';
+    const chars = [];
+    for (let i = 0; i < text.length; i++) {
+        const s = document.createElement('span');
+        s.textContent = text[i];
+        s.className = 'char';
+        el.appendChild(s);
+        if (text[i].trim()) chars.push(s);
     }
-
-    function typeText(i) {
-        if (i <= text.length) {
-            el.textContent = text.substring(0, i);
-            setTimeout(function() { typeText(i + 1); }, typeSpeed);
-        } else {
-            setTimeout(deleteText, pauseAfterType);
-        }
-    }
-
-    function deleteText() {
-        var len = el.textContent.length;
-        if (len > 0) {
-            el.textContent = text.substring(0, len - 1);
-            setTimeout(deleteText, deleteSpeed);
-        } else {
-            fontIndex = (fontIndex + 1) % fonts.length;
-            setFont();
-            setTimeout(function() { typeText(0); }, pauseAfterDelete);
-        }
-    }
-
-    setFont();
-    typeText(0);
+    // Aguarda reveal do hero-sub
+    setTimeout(() => {
+        const timer = setInterval(() => {
+            const unlit = chars.filter(c => !c.classList.contains('lit'));
+            if (!unlit.length) { clearInterval(timer); return; }
+            const pick = unlit[Math.floor(Math.random() * unlit.length)];
+            pick.classList.add('lit');
+        }, 100);
+    }, 1800);
 })();
 
-// ===== FAQ DEEP SPACE PARTICLES =====
-(function() {
-    const faqCanvas = document.getElementById('faq-canvas');
-    if (!faqCanvas) return;
-    const faqCtx = faqCanvas.getContext('2d');
-    const faqSection = faqCanvas.parentElement;
-    let faqParticles = [];
+/* ─────────────────────────────────────────
+   PARTÍCULAS — Seção Autor
+───────────────────────────────────────── */
+(function () {
+    const cv = document.getElementById('particles-canvas');
+    if (!cv) return;
+    const ctx = cv.getContext('2d');
+    let pts = [];
 
-    function resizeFaqCanvas() {
-        faqCanvas.width = faqSection.offsetWidth;
-        faqCanvas.height = faqSection.offsetHeight;
+    function resize() {
+        cv.width  = cv.parentElement.offsetWidth;
+        cv.height = cv.parentElement.offsetHeight;
     }
 
-    function initFaqParticles() {
-        resizeFaqCanvas();
-        faqParticles = [];
-        const count = Math.floor((faqCanvas.width * faqCanvas.height) / 3000);
-        for (let i = 0; i < count; i++) {
-            faqParticles.push({
-                x: Math.random() * faqCanvas.width,
-                y: Math.random() * faqCanvas.height,
-                size: Math.random() * 2.5 + 0.3,
-                opacity: Math.random() * 0.5,
-                fadeSpeed: Math.random() * 0.008 + 0.002,
-                fadeDir: Math.random() > 0.5 ? 1 : -1,
-                maxOpacity: Math.random() * 0.5 + 0.2,
-                isSilver: Math.random() > 0.6
-            });
-        }
+    function init() {
+        resize();
+        const n = Math.min(55, Math.floor((cv.width * cv.height) / 18000));
+        pts = Array.from({ length: n }, () => ({
+            x:  Math.random() * cv.width,
+            y:  Math.random() * cv.height,
+            vx: (Math.random() - 0.5) * 0.15,
+            vy: (Math.random() - 0.5) * 0.15,
+            r:  Math.random() * 1.6 + 0.3,
+            op: Math.random() * 0.3 + 0.05,
+            fd: Math.random() > 0.5 ? 1 : -1,
+            fs: Math.random() * 0.004 + 0.001,
+            mx: Math.random() * 0.35 + 0.08,
+            gold: Math.random() > 0.45,
+        }));
     }
-
-    function animateFaqParticles() {
-        faqCtx.clearRect(0, 0, faqCanvas.width, faqCanvas.height);
-
-        faqParticles.forEach(p => {
-            p.opacity += p.fadeDir * p.fadeSpeed;
-            if (p.opacity >= p.maxOpacity) p.fadeDir = -1;
-            if (p.opacity <= 0) p.fadeDir = 1;
-
-            const r = p.isSilver ? 192 : 201;
-            const g = p.isSilver ? 192 : 168;
-            const b = p.isSilver ? 192 : 76;
-
-            faqCtx.beginPath();
-            faqCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-            faqCtx.fillStyle = `rgba(${r}, ${g}, ${b}, ${p.opacity})`;
-            faqCtx.fill();
+    function loop() {
+        ctx.clearRect(0, 0, cv.width, cv.height);
+        pts.forEach(p => {
+            p.x  += p.vx; p.y += p.vy;
+            p.op += p.fd * p.fs;
+            if (p.op >= p.mx) p.fd = -1;
+            if (p.op <= 0.02) p.fd =  1;
+            if (p.x < 0 || p.x > cv.width)  p.vx *= -1;
+            if (p.y < 0 || p.y > cv.height) p.vy *= -1;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = p.gold
+                ? `rgba(201,168,76,${p.op})`
+                : `rgba(192,192,200,${p.op * 0.6})`;
+            ctx.fill();
         });
-
-        requestAnimationFrame(animateFaqParticles);
+        requestAnimationFrame(loop);
     }
-
-    window.addEventListener('resize', initFaqParticles);
-    initFaqParticles();
-    animateFaqParticles();
+    window.addEventListener('resize', init, { passive: true });
+    init(); loop();
 })();
 
+/* ─────────────────────────────────────────
+   PARTÍCULAS — Seção FAQ
+───────────────────────────────────────── */
+(function () {
+    const cv = document.getElementById('faq-canvas');
+    if (!cv) return;
+    const ctx = cv.getContext('2d');
+    let pts = [];
 
-// ===== FAQ FOCUS EFFECT =====
-(function() {
-    const faqItems = document.querySelectorAll('#faqAccordion .accordion-item');
-    if (!faqItems.length) return;
+    function init() {
+        cv.width  = cv.parentElement.offsetWidth;
+        cv.height = cv.parentElement.offsetHeight;
+        const n = Math.floor((cv.width * cv.height) / 5500);
+        pts = Array.from({ length: n }, () => ({
+            x:  Math.random() * cv.width,
+            y:  Math.random() * cv.height,
+            r:  Math.random() * 1.4 + 0.2,
+            op: Math.random() * 0.25,
+            fd: Math.random() > 0.5 ? 1 : -1,
+            fs: Math.random() * 0.005 + 0.001,
+            mx: Math.random() * 0.22 + 0.04,
+            gold: Math.random() > 0.5,
+        }));
+    }
+    function loop() {
+        ctx.clearRect(0, 0, cv.width, cv.height);
+        pts.forEach(p => {
+            p.op += p.fd * p.fs;
+            if (p.op >= p.mx) p.fd = -1;
+            if (p.op <= 0)    p.fd =  1;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = p.gold
+                ? `rgba(201,168,76,${p.op})`
+                : `rgba(192,192,200,${p.op * 0.5})`;
+            ctx.fill();
+        });
+        requestAnimationFrame(loop);
+    }
+    window.addEventListener('resize', init, { passive: true });
+    init(); loop();
+})();
 
-    document.getElementById('faqAccordion').addEventListener('show.bs.collapse', (e) => {
-        const openItem = e.target.closest('.accordion-item');
-        faqItems.forEach(item => {
-            if (item === openItem) {
-                item.classList.add('faq-active');
-                item.classList.remove('faq-blur');
-            } else {
-                item.classList.add('faq-blur');
-                item.classList.remove('faq-active');
+/* (mapas removidos — sem JS de zoom necessário) */
+
+/* ─────────────────────────────────────────
+   FAQ — accordion custom
+───────────────────────────────────────── */
+(function () {
+    const items = document.querySelectorAll('.faq-item');
+    if (!items.length) return;
+
+    items.forEach(item => {
+        const btn    = item.querySelector('.faq-question');
+        const answer = item.querySelector('.faq-answer');
+        if (!btn || !answer) return;
+
+        btn.addEventListener('click', () => {
+            const isOpen = item.classList.contains('open');
+
+            // Fecha todos
+            items.forEach(i => {
+                i.classList.remove('open');
+                const a = i.querySelector('.faq-answer');
+                if (a) a.style.maxHeight = '0';
+                const b = i.querySelector('.faq-question');
+                if (b) b.setAttribute('aria-expanded', 'false');
+            });
+
+            // Abre o clicado (se estava fechado)
+            if (!isOpen) {
+                item.classList.add('open');
+                answer.style.maxHeight = answer.scrollHeight + 'px';
+                btn.setAttribute('aria-expanded', 'true');
             }
         });
     });
+})();
 
-    document.getElementById('faqAccordion').addEventListener('hidden.bs.collapse', () => {
-        faqItems.forEach(item => {
-            item.classList.remove('faq-blur', 'faq-active');
+/* ─────────────────────────────────────────
+   BACKGROUND ALTERNADO (2.jpg ↔ 1.png)
+   hero, universo, faq → imagem 2 (padrão)
+   lancamento, autor, wiki → imagem 1 (alt)
+───────────────────────────────────────── */
+(function () {
+    const bg = document.querySelector('.site-bg');
+    if (!bg) return;
+
+    const altSections = document.querySelectorAll('#lancamento, #autor, #wiki');
+    if (!altSections.length) return;
+
+    const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                bg.classList.add('bg-alt');
+            }
         });
+    }, { threshold: 0.3 });
+
+    const defSections = document.querySelectorAll('#home, #faq');
+    const obsDefault = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                bg.classList.remove('bg-alt');
+            }
+        });
+    }, { threshold: 0.3 });
+
+    altSections.forEach(s => obs.observe(s));
+    defSections.forEach(s => obsDefault.observe(s));
+})();
+
+/* ─────────────────────────────────────────
+   HERO SLIDESHOW — vídeo + imagens em loop
+   Fluxo: vídeo → img 1 → img 2 → vídeo…
+   Crossfade suave entre cada etapa.
+───────────────────────────────────────── */
+(function () {
+    const video = document.getElementById('heroVideo');
+    const slide1 = document.getElementById('heroSlide1');
+    const slide2 = document.getElementById('heroSlide2');
+    if (!video || !slide1 || !slide2) return;
+
+    const IMAGE_DURATION = 5000; // ms que cada imagem fica visível
+    const FADE_MS = 1400;        // deve bater com o transition do CSS
+
+    video.muted = true;
+    video.loop = false;
+
+    function wait(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function slideSequence() {
+        // Fade out vídeo, fade in imagem 1
+        video.style.opacity = '0';
+        slide1.classList.add('active');
+        await wait(FADE_MS + IMAGE_DURATION);
+
+        // Fade out imagem 1, fade in imagem 2
+        slide1.classList.remove('active');
+        slide2.classList.add('active');
+        await wait(FADE_MS + IMAGE_DURATION);
+
+        // Fade out imagem 2, fade in vídeo
+        slide2.classList.remove('active');
+        video.currentTime = 0;
+        video.style.opacity = '1';
+        video.play().catch(() => {});
+    }
+
+    // Quando o vídeo termina, inicia sequência de imagens
+    video.addEventListener('ended', function () {
+        slideSequence();
+    });
+
+    // Inicia playback
+    video.play().catch(() => {
+        document.addEventListener('click', () => video.play(), { once: true });
     });
 })();
