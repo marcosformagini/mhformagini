@@ -192,21 +192,19 @@ body::after {
     pointer-events: none;
 }
 
-/* ===== NAV FLUTUANTE ===== */
+/* ===== NAV FLUTUANTE =====
+   .floating-nav NÃO pode usar transform: qualquer transform aqui vira
+   containing block dos filhos position:fixed (.floating-nav-inner no
+   mobile e .nav-toggle sempre), quebrando o posicionamento deles em
+   relação à viewport. A animação de entrada mora em .floating-nav-inner. */
 .floating-nav {
     position: fixed;
-    top: 1.2rem;
-    left: 50%;
-    transform: translateX(-50%) translateY(-100px);
+    top: 0; left: 0; right: 0;
     z-index: 1000;
-    opacity: 0;
-    transition: transform 0.5s var(--ease-out), opacity 0.5s ease;
+    display: flex;
+    justify-content: center;
+    padding-top: 1.2rem;
     pointer-events: none;
-}
-.floating-nav.visible {
-    transform: translateX(-50%) translateY(0);
-    opacity: 1;
-    pointer-events: auto;
 }
 .floating-nav-inner {
     display: flex;
@@ -221,6 +219,15 @@ body::after {
     box-shadow:
         0 4px 30px rgba(0,0,0,0.4),
         0 0 0 1px rgba(201,168,76,0.06);
+    opacity: 0;
+    transform: translateY(-100px);
+    transition: transform 0.5s var(--ease-out), opacity 0.5s ease;
+    pointer-events: none;
+}
+.floating-nav.visible .floating-nav-inner {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
 }
 
 .nav-brand {
@@ -285,6 +292,9 @@ body::after {
     cursor: pointer;
     padding: 8px;
     opacity: 0;
+    /* .floating-nav (pai) fica pointer-events:none; sem isso o toggle herdaria
+       none e nunca receberia cliques, mesmo visível e com z-index alto. */
+    pointer-events: auto;
     transform: translateY(-40px);
     transition: opacity 0.4s ease, transform 0.4s ease;
 }
@@ -313,6 +323,7 @@ body::after {
         pointer-events: none;
         transition: transform 0.35s var(--ease-out), opacity 0.3s ease;
     }
+    /* No mobile o painel só aparece com o menu aberto, mesmo com a navbar visível */
     .floating-nav.visible .floating-nav-inner {
         transform: translateY(-16px); opacity: 0; pointer-events: none;
     }
