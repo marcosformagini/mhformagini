@@ -1,7 +1,7 @@
 /* ============================================================
-   M. H. Formagini — Dark Glass Fantasy (v3)
-   CSS moderno: tipografia fluida, scroll-driven animations
-   progressivas, reduced-motion, zero dependências externas.
+   M. H. Formagini — Dark Glass Fantasy (v4)
+   Tipografia fluida, scroll-driven animations progressivas,
+   reduced-motion, zero dependências externas.
    ============================================================ */
 
 /* ===== FONTES (self-hosted, subset latin) ===== */
@@ -71,6 +71,13 @@
     interpolate-size: allow-keywords;
 }
 
+/* Ângulo animável da borda do painel da wiki (progressivo) */
+@property --panel-angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+}
+
 /* ===== RESET ===== */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -120,7 +127,7 @@ body::after {
     mix-blend-mode: overlay;
 }
 
-/* ===== BARRA DE PROGRESSO DE LEITURA (scroll-driven, só onde há suporte) ===== */
+/* ===== BARRA DE PROGRESSO DE LEITURA (scroll-driven) ===== */
 .scroll-progress { display: none; }
 
 @supports (animation-timeline: scroll()) {
@@ -327,13 +334,13 @@ body::after {
     animation: riseUp 0.9s var(--ease-out) forwards;
     animation-delay: calc(0.15s + var(--i, 0) * 0.12s);
 }
-.hero-text    .rise:nth-child(1) { --i: 0; }
-.hero-text    .rise:nth-child(2) { --i: 1; }
-.hero-text    .rise:nth-child(3) { --i: 2; }
-.hero-text    .rise:nth-child(4) { --i: 3; }
-.hero-text    .rise:nth-child(5) { --i: 3; }
-.hero-text    .rise:nth-child(6) { --i: 4; }
-.hero-circle-wrap.rise           { --i: 2; }
+.hero-text .rise:nth-child(1) { --i: 0; }
+.hero-text .rise:nth-child(2) { --i: 1; }
+.hero-text .rise:nth-child(3) { --i: 2; }
+.hero-text .rise:nth-child(4) { --i: 3; }
+.hero-text .rise:nth-child(5) { --i: 3; }
+.hero-text .rise:nth-child(6) { --i: 4; }
+.hero-book-wrap.rise          { --i: 2; }
 
 @keyframes riseUp {
     from { opacity: 0; transform: translateY(28px); }
@@ -427,6 +434,22 @@ body::after {
     pointer-events: none; z-index: 1;
 }
 
+/* Numeral romano fantasma do hero */
+.hero-ghost {
+    position: absolute;
+    top: 50%; left: 42%;
+    transform: translate(-50%, -52%);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(16rem, 30vw, 26rem);
+    line-height: 1;
+    color: rgba(201,168,76,0.02);
+    -webkit-text-stroke: 1px rgba(201,168,76,0.07);
+    pointer-events: none;
+    user-select: none;
+    z-index: 1;
+}
+
 .hero-inner {
     position: relative; z-index: 2;
     max-width: 1280px;
@@ -434,7 +457,7 @@ body::after {
     padding: 4rem var(--space-gutter) 6rem;
     width: 100%;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1.05fr 0.95fr;
     gap: 4rem;
     align-items: center;
 }
@@ -454,6 +477,9 @@ body::after {
 .hero-text { display: flex; flex-direction: column; }
 
 .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
     font-family: var(--font-display);
     font-size: clamp(0.72rem, 0.6rem + 0.4vw, 0.85rem);
     font-weight: 600;
@@ -462,12 +488,18 @@ body::after {
     color: var(--gold);
     margin-bottom: 1.2rem;
 }
+.hero-eyebrow::before {
+    content: '';
+    width: 40px; height: 1px;
+    background: linear-gradient(90deg, var(--gold), transparent);
+    flex-shrink: 0;
+}
 
 .hero-title {
-    font-size: clamp(3rem, 1.8rem + 6vw, 5.8rem);
+    font-size: clamp(3rem, 1.8rem + 6vw, 6.2rem);
     font-weight: 700;
     letter-spacing: 3px;
-    line-height: 1.05;
+    line-height: 1.02;
     background: linear-gradient(
         135deg,
         var(--text)       0%,
@@ -510,7 +542,7 @@ body::after {
 }
 
 .hero-desc {
-    font-size: 1rem;
+    font-size: clamp(1rem, 0.95rem + 0.3vw, 1.12rem);
     line-height: 1.9;
     color: var(--text-2);
     margin-bottom: 2.2rem;
@@ -539,85 +571,73 @@ body::after {
     50%     { opacity: 1;   transform: scaleY(1.1); }
 }
 
-/* ===== HERO — CÍRCULO ===== */
-.hero-circle-wrap {
+/* ===== HERO — LIVRO FLUTUANTE ===== */
+.hero-book-wrap {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
+    perspective: 1100px;
+    min-height: 100%;
+}
+.hero-book {
     position: relative;
+    width: clamp(260px, 32vw, 420px);
+    animation: bookFloat 7s ease-in-out infinite;
+    transform-style: preserve-3d;
+    z-index: 1;
 }
-.hero-circle {
-    position: relative;
-    width: clamp(280px, 38vw, 460px);
-    aspect-ratio: 1;
+@keyframes bookFloat {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-16px); }
 }
-.hero-circle-ring {
-    position: absolute; inset: 0;
-    border-radius: 50%;
-    pointer-events: none;
-}
-.hero-circle-ring--outer {
-    border: 1px solid rgba(201,168,76,0.3);
-    animation: spinSlow 30s linear infinite;
-    background:
-        radial-gradient(circle 3px at 50% 2px, var(--gold) 100%, transparent 100%),
-        radial-gradient(circle 3px at 50% calc(100% - 2px), var(--gold) 100%, transparent 100%),
-        radial-gradient(circle 3px at 2px 50%, var(--gold) 100%, transparent 100%),
-        radial-gradient(circle 3px at calc(100% - 2px) 50%, var(--gold) 100%, transparent 100%);
-}
-.hero-circle-ring--inner {
-    inset: 10%;
-    border: 1px solid rgba(129, 51, 53, 0.35);
-    animation: spinSlow 20s linear infinite reverse;
-}
-@keyframes spinSlow {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(360deg); }
+.hero-book-img {
+    width: 100%; height: auto;
+    filter:
+        drop-shadow(0 34px 42px rgba(0,0,0,0.55))
+        drop-shadow(0 0 70px rgba(201,168,76,0.14));
+    transition: transform 0.25s ease-out;
+    will-change: transform;
 }
 
-.hero-circle-img {
+/* Halo dourado no chão */
+.hero-book-glow {
     position: absolute;
-    inset: 10%;
-    border-radius: 50%;
-    overflow: hidden;
-    background: radial-gradient(circle at 40% 30%, rgba(201,168,76,0.08), rgba(8,8,14,0.9));
-    box-shadow:
-        inset 0 0 60px rgba(8,8,14,0.7),
-        0 0 80px rgba(201,168,76,0.08),
-        0 0 0 1px rgba(201,168,76,0.2);
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-}
-.hero-char-img {
-    width: 90%;
-    height: 100%;
-    object-fit: cover;
-    object-position: top center;
-    filter: drop-shadow(0 4px 24px rgba(0,0,0,0.5));
-    transition: transform 0.6s var(--ease-out);
-}
-.hero-circle:hover .hero-char-img { transform: scale(1.04) translateY(-4px); }
-
-.hero-orbit {
-    position: absolute; inset: -8%;
-    animation: spinSlow 18s linear infinite;
+    bottom: 6%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 68%; height: 70px;
+    background: radial-gradient(ellipse at center, rgba(201,168,76,0.3), transparent 70%);
+    filter: blur(20px);
+    animation: glowPulse 7s ease-in-out infinite;
     pointer-events: none;
 }
-.orbit-dot {
+@keyframes glowPulse {
+    0%, 100% { opacity: 0.55; }
+    50%      { opacity: 1; }
+}
+
+/* Fagulhas cintilantes ao redor do livro */
+.hero-spark {
     position: absolute;
-    width: 6px; height: 6px;
+    width: 5px; height: 5px;
     border-radius: 50%;
     background: var(--gold);
-    box-shadow: 0 0 10px var(--gold), 0 0 20px rgba(201,168,76,0.4);
+    box-shadow: 0 0 10px var(--gold), 0 0 22px rgba(201,168,76,0.5);
+    animation: sparkTwinkle 4s ease-in-out infinite;
+    pointer-events: none;
 }
-.orbit-dot--1 { top: 0;    left: 50%; transform: translateX(-50%); }
-.orbit-dot--2 { bottom: 0; right: 12%; }
-.orbit-dot--3 { top: 48%;  left: -1%; }
+.hero-spark--1 { top: 14%; left: 16%; }
+.hero-spark--2 { top: 30%; right: 10%; animation-delay: 1.3s; }
+.hero-spark--3 { bottom: 20%; left: 8%; animation-delay: 2.6s; width: 4px; height: 4px; }
+@keyframes sparkTwinkle {
+    0%, 100% { opacity: 0.15; transform: scale(0.7); }
+    50%      { opacity: 1;    transform: scale(1); }
+}
 
 .hero-badge {
     position: absolute;
-    bottom: -0.2rem; right: -0.5rem;
+    bottom: 4%; right: 2%;
     background: var(--glass);
     border: 1px solid var(--glass-border);
     backdrop-filter: blur(12px);
@@ -629,6 +649,7 @@ body::after {
     gap: 0.2rem;
     animation: badgeFloat 4s ease-in-out infinite;
     box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    z-index: 2;
 }
 @keyframes badgeFloat {
     0%,100% { transform: translateY(0); }
@@ -648,16 +669,63 @@ body::after {
 }
 
 @media (max-width: 900px) {
+    .hero-ghost { display: none; }
     .hero-inner {
         grid-template-columns: 1fr;
         text-align: center;
-        gap: 3rem;
-        padding: 3rem var(--space-gutter) 5rem;
+        gap: 3.5rem;
+        padding: 4.5rem var(--space-gutter) 5rem;
     }
+    .hero-eyebrow { justify-content: center; }
+    .hero-eyebrow::before { display: none; }
     .hero-divider { margin: 0 auto 1.5rem; }
     .hero-actions { justify-content: center; }
-    .hero-circle  { width: clamp(220px, 70vw, 340px); }
-    .hero-badge   { right: 0; bottom: -0.5rem; }
+    .hero-book    { width: clamp(220px, 62vw, 330px); }
+    .hero-badge   { right: 0; bottom: -1rem; }
+}
+
+/* ===== MARQUEE ===== */
+.marquee {
+    position: relative;
+    z-index: 2;
+    overflow: hidden;
+    border-top: 1px solid var(--glass-border);
+    border-bottom: 1px solid var(--glass-border);
+    background: rgba(8, 8, 14, 0.72);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 1.05rem 0;
+}
+.marquee-track {
+    display: flex;
+    width: max-content;
+    gap: 3rem;
+    animation: marqueeSlide 38s linear infinite;
+}
+.marquee:hover .marquee-track { animation-play-state: paused; }
+.marquee-group {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+    flex-shrink: 0;
+}
+.marquee-group span {
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--text-2);
+    white-space: nowrap;
+}
+.marquee-star {
+    color: var(--gold) !important;
+    font-size: 0.6rem !important;
+    letter-spacing: 0 !important;
+}
+/* desloca exatamente um período (grupo + gap) */
+@keyframes marqueeSlide {
+    to { transform: translateX(calc(-50% - 1.5rem)); }
 }
 
 /* ===== BOTÕES ===== */
@@ -720,6 +788,7 @@ body::after {
 .section {
     position: relative;
     padding: var(--space-section) 0;
+    overflow: hidden;
 }
 .section--alt {
     background: rgba(89, 37, 37, 0.08);
@@ -744,9 +813,32 @@ body::after {
 .section--light b                { color: var(--gold-dark); }
 
 .section-inner {
+    position: relative;
+    z-index: 1;
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 var(--space-gutter);
+}
+
+/* Numerais romanos fantasma nas seções */
+.section-ghost {
+    position: absolute;
+    top: 1.5rem;
+    right: max(1.5rem, 5vw);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(7rem, 15vw, 14rem);
+    line-height: 1;
+    color: rgba(201,168,76,0.03);
+    -webkit-text-stroke: 1px rgba(201,168,76,0.1);
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+}
+.section-ghost--left { right: auto; left: max(1.5rem, 5vw); }
+.section--light .section-ghost {
+    color: rgba(26,20,16,0.025);
+    -webkit-text-stroke-color: rgba(26,20,16,0.09);
 }
 
 .section-header {
@@ -756,16 +848,34 @@ body::after {
 .section-header--left { text-align: left; }
 
 .section-eyebrow {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
     font-family: var(--font-display);
     font-size: 0.65rem;
     letter-spacing: 5px;
     text-transform: uppercase;
     color: var(--gold);
-    margin-bottom: 0.8rem;
+    margin-bottom: 0.9rem;
 }
+.section-eyebrow::before,
+.section-eyebrow::after {
+    content: '';
+    width: 36px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold));
+    flex-shrink: 0;
+}
+.section-eyebrow::after {
+    background: linear-gradient(90deg, var(--gold), transparent);
+}
+.section-header--left .section-eyebrow,
+.wiki-header .section-eyebrow { justify-content: flex-start; }
+.section-header--left .section-eyebrow::before,
+.wiki-header .section-eyebrow::before { display: none; }
+
 .section-title {
-    font-size: clamp(2rem, 1.4rem + 3vw, 3.2rem);
+    font-size: clamp(2rem, 1.4rem + 3vw, 3.4rem);
     font-weight: 700;
     color: var(--text);
     margin-bottom: 1rem;
@@ -783,6 +893,10 @@ body::after {
     line-height: 1.95;
     color: var(--text-2);
     margin-bottom: 1.2rem;
+}
+.text-lead {
+    font-size: clamp(1.05rem, 1rem + 0.4vw, 1.2rem);
+    line-height: 1.9;
 }
 
 /* ===== LANÇAMENTO ===== */
@@ -808,10 +922,10 @@ body::after {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-radius: var(--radius);
-    padding: 1.4rem 1.6rem;
+    padding: 1.5rem 1.7rem;
     display: grid;
     grid-template-columns: 44px 1fr;
-    gap: 0 1rem;
+    gap: 0 1.1rem;
     align-items: start;
     overflow: hidden;
     transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s var(--ease-out);
@@ -832,6 +946,19 @@ body::after {
     box-shadow: 0 8px 30px rgba(0,0,0,0.08);
     transform: translateY(-3px);
 }
+/* Número fantasma do card */
+.glass-card-num {
+    position: absolute;
+    top: 50%; right: 1.3rem;
+    transform: translateY(-50%);
+    font-family: var(--font-display);
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: rgba(139,105,20,0.13);
+    transition: color 0.35s ease;
+    pointer-events: none;
+}
+.glass-card:hover .glass-card-num { color: rgba(139,105,20,0.3); }
 .glass-card-icon {
     grid-row: 1 / 3;
     width: 44px; height: 44px;
@@ -855,6 +982,7 @@ body::after {
     font-size: 0.88rem;
     color: var(--ink-2);
     line-height: 1.75;
+    padding-right: 2.4rem;
 }
 
 @media (max-width: 768px) {
@@ -1078,32 +1206,57 @@ body::after {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1.5rem;
+    gap: 2rem;
 }
-.author-circle {
+
+/* Retrato em arco (janela de catedral) */
+.author-portrait {
     position: relative;
-    width: clamp(200px, 26vw, 300px);
-    aspect-ratio: 1;
+    width: clamp(230px, 26vw, 310px);
+}
+.author-arch {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    border-radius: 999px 999px 14px 14px;
+    overflow: hidden;
+    box-shadow:
+        inset 0 0 40px rgba(0,0,0,0.45),
+        0 20px 50px rgba(0,0,0,0.45);
 }
 .author-photo {
-    position: absolute; inset: 10%;
-    border-radius: 50%;
-    width: 80%; height: 80%;
+    width: 100%; height: 100%;
     object-fit: cover;
     object-position: top;
     filter: grayscale(0.15) contrast(1.05);
-    box-shadow: inset 0 0 30px rgba(0,0,0,0.5), 0 0 40px rgba(0,0,0,0.4);
-    transition: filter 0.5s ease;
+    transition: filter 0.5s ease, transform 0.7s var(--ease-out);
 }
-.author-circle:hover .author-photo { filter: grayscale(0) contrast(1.08); }
-.author-circle-ring {
-    position: absolute; inset: 0;
+.author-portrait:hover .author-photo {
+    filter: grayscale(0) contrast(1.08);
+    transform: scale(1.04);
+}
+/* Moldura dourada deslocada */
+.author-frame {
+    position: absolute;
+    inset: -12px;
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 999px 999px 20px 20px;
+    pointer-events: none;
+    transition: inset 0.4s var(--ease-out), border-color 0.4s ease;
+}
+.author-portrait:hover .author-frame {
+    inset: -7px;
+    border-color: rgba(201,168,76,0.5);
+}
+/* Pedra angular do arco */
+.author-frame-dot {
+    position: absolute;
+    top: -17px; left: 50%;
+    transform: translateX(-50%);
+    width: 9px; height: 9px;
     border-radius: 50%;
-    border: 1px solid rgba(201,168,76,0.25);
-    animation: spinSlow 25s linear infinite;
-    background:
-        radial-gradient(circle 4px at 50% 2px, var(--gold) 100%, transparent 100%),
-        radial-gradient(circle 4px at 50% calc(100% - 2px), rgba(201,168,76,0.4) 100%, transparent 100%);
+    background: var(--gold);
+    box-shadow: 0 0 12px rgba(201,168,76,0.6);
+    pointer-events: none;
 }
 
 .author-social { display: flex; gap: 0.7rem; }
@@ -1127,39 +1280,64 @@ body::after {
     transform: translateY(-3px);
 }
 
+/* Capitular na primeira letra */
+.has-dropcap::first-letter {
+    font-family: var(--font-display);
+    font-size: 3.2em;
+    font-weight: 700;
+    float: left;
+    line-height: 0.82;
+    padding: 0.08em 0.14em 0 0;
+    color: var(--gold);
+}
+
 .author-quote {
-    margin-top: 1.8rem;
-    padding: 1.2rem 1.6rem;
+    position: relative;
+    margin-top: 2rem;
+    padding: 1.8rem 2rem 1.6rem 2.6rem;
     border-left: 2px solid var(--crimson);
     background: var(--glass);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
+/* Aspas gigantes */
+.author-quote::before {
+    content: '\201C';
+    position: absolute;
+    top: -0.05em; left: 0.55rem;
+    font-family: var(--font-display);
+    font-size: 4.4rem;
+    line-height: 1;
+    color: rgba(201,168,76,0.28);
+    pointer-events: none;
+}
 .author-quote p {
     font-style: italic;
-    font-size: 0.95rem;
+    font-size: clamp(0.98rem, 0.92rem + 0.35vw, 1.12rem);
     color: var(--text-2);
     line-height: 1.9;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.7rem;
 }
 .author-quote cite {
     font-family: var(--font-display);
     font-size: 0.7rem;
     letter-spacing: 2px;
-    color: var(--gold-dark);
+    color: var(--gold);
     font-style: normal;
 }
 
 @media (max-width: 768px) {
     .author-layout {
         grid-template-columns: 1fr;
-        gap: 3rem;
+        gap: 3.5rem;
         text-align: center;
     }
     .author-social { justify-content: center; }
     .section-header--left { text-align: center; }
     .section-header--left .section-rule { margin: 0 auto; }
+    .section-header--left .section-eyebrow { justify-content: center; }
+    .has-dropcap::first-letter { font-size: 2.6em; }
 }
 
 /* ===== WIKI ===== */
@@ -1196,6 +1374,10 @@ body::after {
     animation: spinSlow 22s linear infinite;
     background: radial-gradient(circle 3px at 50% 2px, var(--gold) 100%, transparent 100%);
 }
+@keyframes spinSlow {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
 
 .wiki-split {
     display: grid;
@@ -1205,6 +1387,33 @@ body::after {
     margin-top: 2.5rem;
 }
 .wiki-left { display: flex; flex-direction: column; gap: 1.5rem; }
+
+/* Chips de temas */
+.wiki-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+}
+.chip {
+    font-family: var(--font-display);
+    font-size: 0.62rem;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-2);
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--glass-border);
+    border-radius: 50px;
+    background: rgba(201,168,76,0.04);
+    transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease, transform 0.3s var(--ease-out);
+    cursor: default;
+}
+.chip:hover {
+    color: var(--gold-light);
+    border-color: rgba(201,168,76,0.4);
+    background: rgba(201,168,76,0.1);
+    transform: translateY(-2px);
+}
 
 .wiki-info-cards {
     display: flex;
@@ -1226,18 +1435,40 @@ body::after {
     color: var(--gold);
 }
 .section--dark .glass-card h3 { color: var(--text); }
-.section--dark .glass-card p  { color: var(--text-2); }
+.section--dark .glass-card p  { color: var(--text-2); padding-right: 0; }
 
+/* Painel com borda em gradiente cônico girando (progressivo) */
 .wiki-right {
     padding: 2.5rem;
-    border: 1px solid rgba(201,168,76,0.12);
+    border: 1px solid rgba(201,168,76,0.15);
     border-radius: var(--radius);
-    background: rgba(201,168,76,0.03);
+    background: rgba(13,13,13,0.8);
     position: sticky;
     top: 5rem;
     display: flex;
     flex-direction: column;
     gap: 2rem;
+}
+@supports (background: conic-gradient(from 0deg, red, blue)) {
+    .wiki-right {
+        border: 1px solid transparent;
+        background:
+            linear-gradient(rgba(16,14,10,0.94), rgba(16,14,10,0.94)) padding-box,
+            conic-gradient(
+                from var(--panel-angle),
+                rgba(201,168,76,0.05) 0%,
+                rgba(201,168,76,0.55) 12%,
+                rgba(201,168,76,0.05) 28%,
+                rgba(129,51,53,0.35)  55%,
+                rgba(201,168,76,0.05) 72%,
+                rgba(201,168,76,0.55) 88%,
+                rgba(201,168,76,0.05) 100%
+            ) border-box;
+        animation: panelSpin 9s linear infinite;
+    }
+    @keyframes panelSpin {
+        to { --panel-angle: 360deg; }
+    }
 }
 .wiki-ordem-img {
     width: 100%; height: auto;
@@ -1277,10 +1508,12 @@ body::after {
     .wiki-split  { grid-template-columns: 1fr; gap: 2.5rem; }
     .wiki-right  { position: static; }
     .wiki-header { flex-direction: column; text-align: center; gap: 1rem; }
+    .wiki-header .section-eyebrow { justify-content: center; }
     .wiki-rule   { margin: 0 auto 3rem; }
+    .wiki-chips  { justify-content: center; }
 }
 
-/* ===== FAQ ===== */
+/* ===== FAQ (editorial: linhas, sem caixas) ===== */
 #faq-canvas {
     position: absolute; inset: 0;
     width: 100%; height: 100%;
@@ -1288,48 +1521,49 @@ body::after {
 }
 .faq-inner { position: relative; z-index: 2; }
 .faq-list {
-    max-width: 1100px;
+    max-width: 860px;
     margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
+    border-top: 1px solid rgba(201,168,76,0.18);
 }
 
-/* Accordion nativo: <details name="faq"> — exclusivo, sem JS */
 .faq-item {
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-sm);
-    background: var(--glass);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    overflow: hidden;
-    transition: border-color 0.3s ease, transform 0.35s var(--ease-out), box-shadow 0.35s ease;
+    border-bottom: 1px solid var(--glass-border);
+    transition: background 0.35s ease;
 }
 .faq-item[open] {
-    border-color: rgba(201,168,76,0.3);
-    transform: scale(1.03);
-    box-shadow: 0 12px 40px rgba(201,168,76,0.1);
-    position: relative;
-    z-index: 1;
+    background: linear-gradient(90deg, rgba(201,168,76,0.06), transparent 70%);
 }
 .faq-question {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 1.8rem 2.2rem;
+    gap: 1.4rem;
+    padding: 1.9rem 0.6rem;
     cursor: pointer;
     list-style: none;
     font-family: var(--font-display);
-    font-size: 0.92rem;
+    font-size: clamp(0.92rem, 0.88rem + 0.3vw, 1.08rem);
     font-weight: 600;
     color: var(--text);
-    transition: color 0.3s;
+    transition: color 0.3s, padding-left 0.35s var(--ease-out);
     -webkit-tap-highlight-color: transparent;
 }
 .faq-question::-webkit-details-marker { display: none; }
-.faq-question:hover,
-.faq-item[open] .faq-question { color: var(--gold-light); }
+.faq-question:hover { color: var(--gold-light); padding-left: 1rem; }
+.faq-item[open] .faq-question { color: var(--gold-light); padding-left: 1rem; }
+
+.faq-num {
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--gold-dark);
+    min-width: 2.2rem;
+    flex-shrink: 0;
+    transition: color 0.3s ease;
+}
+.faq-item[open] .faq-num,
+.faq-question:hover .faq-num { color: var(--gold); }
+.faq-q-text { flex: 1; }
 
 /* Ícone “+” desenhado em CSS, vira “×” ao abrir */
 .faq-icon {
@@ -1351,7 +1585,7 @@ body::after {
 .faq-icon::after  { width: 1.5px; height: 14px; }
 .faq-item[open] .faq-icon { transform: rotate(45deg); }
 
-/* Animação de abertura (progressiva: navegadores sem suporte abrem direto) */
+/* Animação de abertura (progressiva: sem suporte, abre direto) */
 .faq-item::details-content {
     opacity: 0;
     block-size: 0;
@@ -1366,16 +1600,22 @@ body::after {
     block-size: auto;
 }
 .faq-answer p {
-    padding: 0 2.2rem 1.8rem;
+    padding: 0 3rem 2rem 4.6rem;
     font-size: 0.95rem;
     line-height: 1.9;
     color: var(--text-2);
 }
 
+@media (max-width: 600px) {
+    .faq-question { gap: 1rem; padding: 1.6rem 0.3rem; }
+    .faq-num { min-width: 1.8rem; }
+    .faq-answer p { padding: 0 1rem 1.8rem 3.1rem; }
+}
+
 /* ===== FOOTER ===== */
 .footer {
     position: relative;
-    padding: 3rem 0;
+    padding: 4.5rem 0 2.5rem;
     border-top: 1px solid var(--glass-border);
     background: rgba(8,8,14,0.7);
     backdrop-filter: blur(8px);
@@ -1385,25 +1625,104 @@ body::after {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 var(--space-gutter);
-    text-align: center;
-    display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+}
+.footer-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr auto;
+    gap: 3rem;
+    align-items: start;
+    padding-bottom: 3rem;
+}
+.footer-col--brand {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 .footer-logo {
-    height: 34px; width: auto;
-    opacity: 0.7;
+    height: 40px; width: auto;
+    opacity: 0.75;
     filter: brightness(1.8);
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.5rem;
 }
 .footer-brand {
     font-family: var(--font-display);
-    font-size: 0.92rem;
+    font-size: 1.05rem;
     font-weight: 700;
     letter-spacing: 2px;
     color: var(--gold);
 }
+.footer-tag {
+    font-size: 0.85rem;
+    font-style: italic;
+    color: var(--text-muted);
+    line-height: 1.7;
+}
+.footer-col--nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, max-content));
+    gap: 0.4rem 2.5rem;
+    align-content: start;
+    padding-top: 0.4rem;
+}
+.footer-col--nav a {
+    font-family: var(--font-display);
+    font-size: 0.72rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-2);
+    text-decoration: none;
+    padding: 0.35rem 0;
+    transition: color 0.3s ease;
+    white-space: nowrap;
+}
+.footer-col--nav a:hover { color: var(--gold-light); }
+.footer-col--social {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    align-items: flex-start;
+    padding-top: 0.4rem;
+}
+.footer-social-label {
+    font-family: var(--font-display);
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+}
+.footer-social-row { display: flex; gap: 0.7rem; }
+
+.footer-ornament {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    color: var(--gold);
+    font-size: 0.6rem;
+    margin-bottom: 1.6rem;
+}
+.footer-ornament span {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201,168,76,0.35), transparent);
+}
 .footer-copy {
     font-size: 0.8rem;
     color: var(--text-muted);
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+        text-align: center;
+    }
+    .footer-col--brand { align-items: center; }
+    .footer-col--nav {
+        justify-content: center;
+        gap: 0.4rem 2rem;
+    }
+    .footer-col--social { align-items: center; }
 }
 
 /* ===== MOVIMENTO REDUZIDO ===== */
@@ -1422,4 +1741,6 @@ body::after {
     }
     .progress-fill { width: var(--w, 0%); }
     .scroll-progress { display: none; }
+    .marquee-track { animation: none; }
+    .hero-spark { opacity: 0.5; }
 }

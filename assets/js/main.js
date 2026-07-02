@@ -315,6 +315,32 @@ createCanvasScene(
 })();
 
 /* ─────────────────────────────────────────
+   HERO — TILT 3D DO LIVRO
+───────────────────────────────────────── */
+(function () {
+    if (REDUCED || !window.matchMedia('(pointer: fine)').matches) return;
+    const book = document.getElementById('heroBook');
+    if (!book) return;
+    const img = book.querySelector('.hero-book-img');
+    const wrap = book.closest('.hero-book-wrap');
+    if (!img || !wrap) return;
+
+    const MAX = 10; // graus
+
+    wrap.addEventListener('mousemove', e => {
+        const r = wrap.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - 0.5;
+        const y = (e.clientY - r.top) / r.height - 0.5;
+        img.style.transform =
+            `rotateY(${x * MAX}deg) rotateX(${-y * MAX}deg) scale(1.03)`;
+    }, { passive: true });
+
+    wrap.addEventListener('mouseleave', () => {
+        img.style.transform = '';
+    }, { passive: true });
+})();
+
+/* ─────────────────────────────────────────
    FUNDO ALTERNADO POR SEÇÃO
 ───────────────────────────────────────── */
 (function () {
