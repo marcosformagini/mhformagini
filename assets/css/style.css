@@ -6,6 +6,15 @@
 
 /* ===== FONTES (self-hosted, subset latin) ===== */
 @font-face {
+    /* Original só tinha ASCII; glifos acentuados PT-BR foram
+       compostos a partir de ~ ^ ` , (fonte: Pirate Scroll PT.otf). */
+    font-family: 'Pirate Scroll';
+    font-style: normal;
+    font-weight: 400 900;
+    font-display: swap;
+    src: url('../fonts/pirate-scroll.woff2') format('woff2');
+}
+@font-face {
     font-family: 'Cinzel';
     font-style: normal;
     font-weight: 400 900;
@@ -56,6 +65,7 @@
     --ink-2:         #3D3830;
 
     --font-display:  'Cinzel', 'Times New Roman', serif;
+    --font-title:    'Pirate Scroll', 'Cinzel', 'Times New Roman', serif;
     --font-body:     'Libre Baskerville', Georgia, serif;
 
     --radius:        16px;
@@ -100,7 +110,7 @@ body {
 img, svg, video { display: block; max-width: 100%; }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-display);
+    font-family: var(--font-title);
     font-weight: 600;
     line-height: 1.15;
     text-wrap: balance;
@@ -231,7 +241,7 @@ body::after {
 }
 
 .nav-brand {
-    font-family: var(--font-display);
+    font-family: var(--font-title);
     font-size: 1.05rem;
     font-weight: 700;
     letter-spacing: 1.5px;
