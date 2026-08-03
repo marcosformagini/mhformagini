@@ -18,7 +18,9 @@
     <link rel="preload" href="assets/fonts/pirate-scroll.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="assets/fonts/cinzel-var.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="assets/fonts/libre-baskerville-400.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="assets/video/poster.webp" as="image" type="image/webp" fetchpriority="high">
+    <link rel="preload" href="assets/img/capa/sdg-mock-aberto-700.webp" as="image" type="image/webp"
+          imagesrcset="assets/img/capa/sdg-mock-aberto-700.webp 700w, assets/img/capa/sdg-mock-aberto-1400.webp 1400w"
+          imagesizes="(max-width: 900px) 82vw, 40vw" fetchpriority="high">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="stylesheet" href="assets/css/style.css">
     <script src="assets/js/main.js" defer></script>
@@ -65,31 +67,17 @@
     </button>
 </nav>
 
-<!-- ===== HERO ===== -->
+<!-- ===== HERO — papel creme com a muralha nascendo da borda ===== -->
 <section id="home" class="hero">
-    <div class="hero-media" aria-hidden="true">
-        <video id="heroVideo" class="hero-video"
-               muted playsinline preload="none"
-               poster="assets/video/poster.webp"
-               width="1280" height="720">
-            <source src="assets/video/intro-1280.mp4" type="video/mp4">
-        </video>
-        <div id="heroSlide1" class="hero-slide">
-            <img src="assets/img/bg-alt-1920.webp"
-                 srcset="assets/img/bg-alt-960.webp 960w, assets/img/bg-alt-1920.webp 1920w"
-                 sizes="100vw" width="1920" height="1270" alt="" loading="lazy" decoding="async">
-        </div>
-        <div id="heroSlide2" class="hero-slide">
-            <img src="assets/img/bg-hero-1920.webp"
-                 srcset="assets/img/bg-hero-960.webp 960w, assets/img/bg-hero-1920.webp 1920w"
-                 sizes="100vw" width="1920" height="1378" alt="" loading="lazy" decoding="async">
-        </div>
-        <div class="hero-media-overlay"></div>
-    </div>
-
     <canvas id="hero-ember-canvas" aria-hidden="true"></canvas>
-    <div class="hero-fog hero-fog-1" aria-hidden="true"></div>
-    <div class="hero-fog hero-fog-2" aria-hidden="true"></div>
+
+    <!-- A arte da capa com o céu recortado: o papel do site é o céu -->
+    <div class="hero-scape" aria-hidden="true">
+        <img src="assets/img/capa/arte-recorte-1400.webp"
+             srcset="assets/img/capa/arte-recorte-1400.webp 1400w, assets/img/capa/arte-recorte-2200.webp 2200w"
+             sizes="100vw" width="1400" height="523"
+             alt="" decoding="async">
+    </div>
 
     <div class="hero-inner">
         <!-- Texto -->
@@ -112,11 +100,11 @@
         <div class="hero-book-wrap rise" aria-hidden="true">
             <div class="hero-book-glow"></div>
             <div class="hero-book" id="heroBook">
-                <img src="assets/img/capa/sdg-mock-capa-dura-600.webp"
-                     srcset="assets/img/capa/sdg-mock-capa-dura-600.webp 600w, assets/img/capa/sdg-mock-capa-dura-1100.webp 1100w"
-                     sizes="(max-width: 900px) 72vw, 32vw"
-                     width="600" height="905"
-                     alt="Mockup da Edição Definitiva de Sombras da Guerra em capa dura"
+                <img src="assets/img/capa/sdg-mock-aberto-700.webp"
+                     srcset="assets/img/capa/sdg-mock-aberto-700.webp 700w, assets/img/capa/sdg-mock-aberto-1400.webp 1400w"
+                     sizes="(max-width: 900px) 82vw, 40vw"
+                     width="700" height="474"
+                     alt="Capa aberta da Edição Definitiva de Sombras da Guerra"
                      class="hero-book-img" fetchpriority="high" decoding="async">
             </div>
             <span class="hero-spark hero-spark--1"></span>
@@ -156,8 +144,18 @@
     </div>
 </div>
 
-<!-- ===== A CAPA ===== -->
-<section id="capa" class="section">
+<!-- ===== A CAPA =====
+     A pintura de Tiago Sousa é o FUNDO da seção: cinza no repouso,
+     ganha cor quando o mouse entra na seção (scrub de rolagem no toque). -->
+<section id="capa" class="section section--paper">
+    <div class="capa-bg" aria-hidden="true">
+        <img class="capa-bg-gray"
+             src="assets/img/capa/arte-cinza-1200.webp"
+             srcset="assets/img/capa/arte-cinza-1200.webp 1200w, assets/img/capa/arte-cinza-2000.webp 2000w"
+             sizes="100vw" width="1200" height="794" loading="lazy" decoding="async" alt="">
+        <img class="capa-bg-color" src="assets/img/capa/arte-cor-1800.webp"
+             width="1800" height="1190" loading="lazy" decoding="async" alt="">
+    </div>
     <div class="section-inner">
         <header class="sec-head reveal">
             <div class="sec-meta">
@@ -206,40 +204,13 @@
                     <p>E, no rastro dos exércitos, algo desperta. Os corvos não são os únicos com fome.</p>
                     <cite>Quarta capa · Sombras da Guerra</cite>
                 </blockquote>
+
+                <p class="capa-note reveal" style="--d:.18s">
+                    Ao fundo, a pintura original de Tiago Sousa — a muralha inteira vai bem
+                    além do que coube na capa. Passe o mouse (ou role) para a cor voltar.
+                </p>
             </div>
         </div>
-
-        <div class="capa-subhead reveal">
-            <span class="sec-label">A arte de Tiago Sousa</span>
-            <span class="sec-line" aria-hidden="true"></span>
-        </div>
-
-        <figure class="artwork reveal">
-            <button type="button" class="zoom"
-                    data-lightbox="assets/img/capa/arte-cor-1800.webp"
-                    data-caption="A pintura original, em cor — Tiago Sousa">
-                <span class="artwork-shot">
-                    <img class="artwork-gray"
-                         src="assets/img/capa/arte-cinza-1200.webp"
-                         srcset="assets/img/capa/arte-cinza-1200.webp 1200w, assets/img/capa/arte-cinza-2000.webp 2000w"
-                         sizes="(max-width: 880px) 92vw, 1150px"
-                         width="1200" height="794" loading="lazy" decoding="async"
-                         alt="Trecho da pintura da capa: a muralha de Bravorte sob um céu de tempestade, com estandartes escarlates e figuras encapuzadas no portão">
-                    <img class="artwork-color" src="assets/img/capa/arte-cor-1800.webp"
-                         width="1800" height="1190" loading="lazy" decoding="async" alt="">
-                </span>
-                <span class="zoom-hint" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5M11 8v6M8 11h6"/></svg>
-                    Ver inteira
-                </span>
-                <span class="sr-only">Ver a pintura original completa, em cor</span>
-            </button>
-            <figcaption>
-                Um trecho. A muralha inteira vai bem além do que coube na capa — o que virou
-                o livro é só o portão. Passe o mouse — ou role — para a cor voltar; clique
-                para ver tudo.
-            </figcaption>
-        </figure>
 
         <div class="capa-subhead reveal">
             <span class="sec-label">A edição por inteiro</span>
@@ -384,13 +355,13 @@
                             </div>
                             <div class="progress-bar"><div class="progress-fill" style="--w:100%"></div></div>
                         </div>
-                        <div class="progress-step progress-step--begining">
+                        <div class="progress-step progress-step--almost">
                             <div class="progress-dot"></div>
                             <div class="progress-info">
                                 <span class="progress-label">Revisão</span>
-                                <span class="progress-status progress-status--almost">Em andamento</span>
+                                <span class="progress-status progress-status--almost">Quase concluída</span>
                             </div>
-                            <div class="progress-bar"><div class="progress-fill" style="--w:30%"></div></div>
+                            <div class="progress-bar"><div class="progress-fill" style="--w:82%"></div></div>
                         </div>
                         <div class="progress-step progress-step--pending">
                             <div class="progress-dot"></div>
@@ -567,7 +538,7 @@
 </section>
 
 <!-- ===== FAQ ===== -->
-<section id="faq" class="section">
+<section id="faq" class="section section--paper">
     <canvas id="faq-canvas" aria-hidden="true"></canvas>
     <div class="section-inner faq-inner">
         <header class="sec-head reveal">

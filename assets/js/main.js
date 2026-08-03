@@ -196,7 +196,8 @@ createCanvasScene(
             if (e.life <= 0 || e.y < -10) { st.embers[i] = st.make(false); return; }
             const a = e.life * e.base;
             if (a < 0.01) return;
-            const [r, g, b] = e.gold ? [214, 92, 75] : [192, 192, 200];
+            // Sobre o papel creme: brasas vinho e motas de nanquim
+            const [r, g, b] = e.gold ? [158, 43, 34] : [61, 56, 48];
             const gr = ctx.createRadialGradient(e.x, e.y, 0, e.x, e.y, e.size * 2.5);
             gr.addColorStop(0, `rgba(${r},${g},${b},${a})`);
             gr.addColorStop(1, `rgba(${r},${g},${b},0)`);
@@ -268,8 +269,8 @@ createCanvasScene(
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
             ctx.fillStyle = p.gold
-                ? `rgba(217,88,75,${p.op})`
-                : `rgba(192,192,200,${p.op * 0.5})`;
+                ? `rgba(158,43,34,${p.op * 0.7})`
+                : `rgba(61,56,48,${p.op * 0.45})`;
             ctx.fill();
         });
     }
