@@ -3,56 +3,92 @@
 ## Identidade
 
 - Site pessoal de autor de **Fantasia Épica** e **Alta Fantasia**
-- Tom: clássico, moderno e elegante
 - Universo literário: Erráwyn, Crônicas Méssias
+- Linguagem: **cartaz impresso**. Campo de papel envelhecido, imagem em
+  escala de cinza, e UM vermelho óxido como única cor da página.
 
-## Paleta de Cores
+## Paleta
 
-- **Fundo profundo:** #0A0A0F (bg-deep), #12121A (bg-surface), #1A1A25 (bg-elevated)
-- **Dourado:** #C9A84C (principal), #E8D48B (claro), #8B6914 (escuro)
-- **Prata:** #C0C0C0 (principal), #E0E0E0 (claro), #808080 (escuro)
-- **Texto:** #F0EDE6 (primário), #9B978F (secundário), #6B6860 (muted)
-- Contraste forte: dourado e prata sobre preto
+Preto, branco, escalas de cinza — e o vermelho que destaca.
+
+- **Papel:** `--paper` #DED7CA · `--paper-2` #D5CDBE · `--paper-3` #C7BEAC (fios, bordas)
+- **Nanquim:** `--ink` #141312 · `--ink-2` #3A3531 (corpo) · `--ink-3` #6D665E · `--ink-4` #9A9187
+- **A única cor:** `--red` #9E2B22 (sobre papel) · `--red-lift` #D9584B (sobre nanquim) ·
+  `--red-deep` #6E1A14 (massas sólidas)
+
+Regras:
+- Nada de segunda cor. Se algo precisa de destaque, é vermelho ou é nanquim.
+- Contraste: `--red` só como texto sobre papel; sobre nanquim usar `--red-lift`.
+- Toda foto leva `filter: grayscale(1)`. **Única exceção:** a capa do livro e
+  os mockups — já são cinza com estandartes escarlates, são a origem da paleta.
+
+## Formas
+
+- **O arco** (`.arch`): retângulo de topo semicircular, vermelho chapado.
+  Forma-assinatura, sempre atrás do assunto: capa, retrato do autor, hero.
+- **Marcas de registro** (`.tick`): cruzetas de 1px nos cantos, como prova de gráfica.
+- **Fios pendurados** (`.drips`): cotas de desenho técnico ancoradas na **parte
+  de baixo** das seções. Comprimentos e tons desiguais, agrupamento sem ritmo —
+  é a variação que impede virar trama. Definidos uma vez em `<defs>`
+  (`#drips-a` denso, `#drips-b` esparso) e reaproveitados com `<use>`; cada
+  faixa de opacidade é um `<path>` só. Sobre nanquim viram creme.
+- **Grão + envelhecimento** (`.grain` e `.grain::before`): ruído fixo em dois
+  ladrilhos de tamanhos primos entre si (512/662px, sem emenda visível), mais
+  manchas de umidade e vinheta quente. Sem `mix-blend-mode` — camada fixa que
+  mistura faz o Chrome compor faixas em branco ao rolar.
+- **Arte sangrando** (`.hero-scape`): a pintura com o céu recortado nasce da
+  borda de baixo do hero e se dissolve pra cima por `mask-image`.
+- Sem cantos arredondados, sem vidro fosco, sem sombras coloridas.
 
 ## Tipografia
 
-- **Títulos (h1–h6):** Cinzel — serifada clássica, capitalize
-- **Títulos de destaque (hero, brand, announcement):** Cinzel Decorative — ornamental
-- **Corpo de texto:** Libre Caslon Text (serifada, encorpada, legível, peso 400; itálico quando necessário)
-- **Navbar brand:** Cinzel Decorative
-- **Nav links, botões, badges, tags:** Libre Caslon Text
-- Usar itálico para subtítulos, citações e textos de destaque emocional
-- Letter-spacing generoso em elementos uppercase
+- **Título do livro** (`.hero-title`): Pirate Scroll, vermelho, empilhado, entrelinha 0.86.
+  É a letra da capa — usar **só** para "Sombras da Guerra".
+- **Display de seção** (`.sec-title`): Cinzel, caixa alta, vermelho, empilhado
+  em `<span>` por linha, entrelinha 0.92. `<em>` dentro do título vira nanquim
+  (o bicolor vermelho/preto é a assinatura).
+- **Corpo:** Libre Baskerville, `--ink-2`, medida ~62ch.
+- **Meta / rótulos / botões:** Cinzel caixa alta, 0.6–0.7rem, letter-spacing 2.5–4px.
 
-## Animações
+## Ritmo das seções
 
-- Partículas douradas flutuantes (canvas) — efeito de fantasia
-- Scroll reveal com timing escalonado (cubic-bezier)
-- Hover suave em cards (translateY + box-shadow + glow)
-- Ornamentos com gradiente linear (transparent → gold → transparent)
-- Hero com reveal sequencial (keyframes revealUp com delays)
-- Indicador de scroll com animação float
+Papel domina; o nanquim entra como inversão deliberada.
 
-## Componentes
+Hero (papel) → marquee (nanquim) → A Capa (papel) → Lançamento (papel-2) →
+Autor (**nanquim**) → Wiki (papel) → FAQ (papel-2) → rodapé (**nanquim**)
 
-- **Navbar:** backdrop-filter blur, borda sutil dourada, links uppercase com underline animado
-- **Cards:** fundo elevated, borda dourada sutil, hover com elevação e brilho top-line
-- **Botões:** estilo outlined com borda dourada, hover fill com glow
-- **Ornamentos:** linhas gradiente com diamante central (◆)
-- **Seções:** separadas por linhas gradiente douradas
+## Créditos
 
-## Estrutura
+Visíveis na seção A Capa: **Arte** Tiago Sousa · **Capa** Bia Cunha
 
-- Single-page HTML (simplicidade)
-- Bootstrap 5 para grid e responsividade
-- CSS custom properties (variáveis)
-- JavaScript vanilla para animações
-- Sem frameworks JS pesados
+## Efeitos
+
+O cartaz precisa respirar. Nada de decoração gratuita — todo efeito vem de
+uma metáfora de impressão ou de desenho técnico.
+
+- **O arco cresce** do rodapé da seção ao entrar na tela (`scaleY`), e **desce
+  até a seção acabar**. Onde ele cruzaria texto, estreita numa perna via
+  `clip-path` — vermelho chapado atrás de corpo de texto é ilegível.
+- **Os fios se desenham** de cima para baixo (`clip-path` na faixa).
+- **Imagens grandes** são reveladas por limpeza de baixo para cima
+  (`.reveal--wipe`), como folha saindo da prensa — não sobem nem esmaecem.
+- **A pintura sangra cor** no hover: a versão colorida mora sob a cinza e é
+  revelada da esquerda para a direita. É o argumento da paleta, encenado.
+- **Varredura de tinta** atravessando o título do livro, devagar.
+- **Poeira de papel** suspensa no hero (canvas, pausa fora da tela).
+- **Parallax de rolagem** por `animation-timeline: view()` — progressivo.
+- **Selos** entram carimbando e ficam levemente tortos.
+- Botões preenchem de baixo para cima; capa levanta do papel no hover.
+
+**Armadilha recorrente:** o `IntersectionObserver` leva `clip-path` e
+`transform` em conta. Elemento que começa recortado ou achatado nunca "entra"
+na tela sozinho — observe sempre o **container**, nunca o próprio enfeite.
 
 ## Princípios
 
-- Elegância sobre complexidade
-- Animações sutis, nunca exageradas
-- Espaçamento generoso (padding 7rem nas seções)
-- Mobile-first responsivo
-- Acessibilidade (aria-labels, contraste adequado)
+- Elegância pela restrição, não pelo acúmulo
+- Animação sutil: reveal no scroll, deriva do livro com o mouse, nada além disso
+- Sem canvas, sem partículas, sem vídeo de fundo
+- Espaçamento generoso, alinhamento à esquerda, ragged right
+- Mobile-first responsivo, acessibilidade (aria-labels, contraste adequado)
+- Zero dependências externas
