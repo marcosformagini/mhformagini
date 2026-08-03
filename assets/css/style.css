@@ -1,10 +1,21 @@
 /* ============================================================
-   M. H. Formagini — Papel & Sangue (v6)
+   M. H. Formagini — Papel & Sangue (v7)
 
    Linguagem de cartaz: campo de papel envelhecido, imagem em
    escala de cinza, e UM vermelho óxido como única cor. Formas
    geométricas duras (o arco), fios de nanquim, marcas de registro.
    Zero dependências externas.
+
+   SISTEMA DE MOVIMENTO — contrato:
+   · Uma curva (--ease). Scroll-driven é sempre linear (scrub).
+   · Cinco durações: touch 180 / move 320 / read 640 / press 960
+     / draw 1400. Nada fora da escala.
+   · Stagger 90ms, teto de 4 passos. Distância de subida única (18px).
+   · ZERO animações infinitas.
+   · LEI DO OBSERVER: todo elemento que nasce com clip-path ou
+     transform (fios, arcos, wipes) registra o PAI no
+     IntersectionObserver — o próprio nunca "entra" na tela.
+   · Nenhum efeito entra sem sua linha no bloco reduced-motion.
    ============================================================ */
 
 /* ===== FONTES (self-hosted, subset latin) ===== */
@@ -59,21 +70,34 @@
     --ink-2:     #3A3531;
     --ink-3:     #6D665E;
     --ink-4:     #9A9187;
+    --ink-line:  #2E2A27;   /* fios sobre nanquim */
+    --ink-body:  #C3BCB1;   /* corpo de texto sobre nanquim */
 
     /* A única cor */
     --red:       #9E2B22;   /* sobre papel */
     --red-lift:  #D9584B;   /* sobre nanquim */
     --red-deep:  #6E1A14;   /* massas sólidas */
-    --red-rgb:   158, 43, 34;
 
     --font-book:    'Pirate Scroll', 'Cinzel', 'Times New Roman', serif;
     --font-display: 'Cinzel', 'Times New Roman', serif;
     --font-body:    'Libre Baskerville', Georgia, serif;
 
+    /* Rótulos: dois tamanhos, e só dois */
+    --fs-label:   0.68rem;   /* + letter-spacing 3px  */
+    --fs-label-s: 0.6rem;    /* + letter-spacing 2.5px */
+
     --space-section: clamp(4.5rem, 3.5rem + 6vw, 8.5rem);
     --space-gutter:  clamp(1.25rem, 0.6rem + 3vw, 2.5rem);
 
-    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    /* Movimento — a escala fechada */
+    --ease:    cubic-bezier(0.22, 1, 0.36, 1);
+    --t-touch: 180ms;
+    --t-move:  320ms;
+    --t-read:  640ms;
+    --t-press: 960ms;
+    --t-draw:  1400ms;
+    --stagger: 90ms;
+    --rise:    18px;
 
     /* Permite animar height/block-size: auto (progressivo) */
     interpolate-size: allow-keywords;
@@ -121,28 +145,25 @@ em { font-style: italic; }
     border: 0;
 }
 
-/* Grão de papel — impresso por cima de tudo, inclusive das fotos.
-   Sem mix-blend-mode: uma camada fixa que mistura por cima do resto
-   faz o Chrome compor faixas em branco ao rolar. O ruído já sai
-   tingido de nanquim translúcido, o que dá o mesmo resultado. */
+/* ===== GRÃO DE PAPEL =====
+   Impresso por cima de tudo, inclusive das fotos. Sem
+   mix-blend-mode: camada fixa que mistura faz o Chrome compor
+   faixas em branco ao rolar. O ruído já sai tingido. */
 .grain {
     position: fixed;
     inset: 0;
     z-index: 9998;
     pointer-events: none;
-    /* Duas camadas em ladrilhos de tamanhos primos entre si: o padrão só
-       se repetiria a cada ~250 mil px, então o olho não acha a emenda. */
+    /* Ladrilhos de tamanhos primos entre si: o padrão só se
+       repetiria a cada ~250 mil px — o olho não acha a emenda. */
     background-image:
-        /* grão fino da fibra */
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cfilter id='a'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.16  0 0 0 0 0.12  0 0 0 0 0.09  0.13 0 0 0 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23a)'/%3E%3C/svg%3E"),
-        /* manchado largo, a variação de tom do papel */
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 331 331'%3E%3Cfilter id='b'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.02' numOctaves='4' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.18  0 0 0 0 0.14  0 0 0 0 0.10  0.09 0 0 0 -0.02'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23b)'/%3E%3C/svg%3E");
     background-size: 512px 512px, 662px 662px;
 }
 
-/* Envelhecimento: manchas de umidade espalhadas e uma vinheta quente
-   nas bordas, como uma folha guardada há tempo demais. Fixa na janela —
-   a página inteira é uma folha só, não uma folha por seção. */
+/* Envelhecimento: manchas de umidade e vinheta quente. A página
+   inteira é uma folha só, não uma folha por seção. */
 .grain::before {
     content: '';
     position: absolute;
@@ -157,15 +178,15 @@ em { font-style: italic; }
 }
 
 /* ===== IMAGEM: TUDO EM ESCALA DE CINZA =====
-   A única cor do site é o vermelho da tipografia e das formas.
-   Exceção: a capa do livro, que já é cinza com estandartes
-   escarlates — é a origem da paleta, entra como está. */
+   Exceção: a capa e os mockups — já são cinza com estandartes
+   escarlates, são a origem da paleta. O mapa chega pré-processado
+   em cinza no próprio arquivo. */
 .author-photo,
-.wiki-shot,
-.wiki-seal,
 .footer-logo {
     filter: grayscale(1) contrast(1.06);
 }
+/* O selo é branco: invertido vira tinta sobre o papel */
+.wiki-seal { filter: grayscale(1) invert(0.78); }
 
 /* ===== BARRA DE PROGRESSO DE LEITURA (scroll-driven) ===== */
 .scroll-progress { display: none; }
@@ -191,27 +212,23 @@ em { font-style: italic; }
     }
 }
 
-/* Poeira de papel suspensa no hero */
-#dust-canvas {
-    position: absolute;
-    inset: 0;
-    width: 100%; height: 100%;
-    z-index: 1;
-    pointer-events: none;
-}
-
 /* ===== O ARCO =====
-   Retângulo de topo semicircular. É a forma-assinatura do site:
-   aparece atrás da capa, atrás do retrato e no hero. */
+   Retângulo de topo semicircular, vermelho chapado. A forma-
+   assinatura: atrás da capa, do retrato e no hero. Cresce do
+   chão quando o PAI entra na tela (lei do observer). */
 .arch {
     position: absolute;
     display: block;
     background: var(--red);
     border-radius: 50vw 50vw 0 0;
     pointer-events: none;
+    transform: scaleY(0.04);
+    transform-origin: 50% 100%;
+    transition: transform var(--t-draw) var(--ease) 0.1s;
 }
+.arch.grown, .no-js .arch { transform: scaleY(1); }
 
-/* ===== MARCAS DE REGISTRO E FIOS ===== */
+/* ===== MARCAS DE REGISTRO ===== */
 .tick {
     position: absolute;
     width: 14px; height: 14px;
@@ -226,11 +243,13 @@ em { font-style: italic; }
 }
 .tick::before { left: 50%; top: 0; width: 1px; height: 100%; }
 .tick::after  { top: 50%; left: 0; height: 1px; width: 100%; }
-.tick--tl { top: 1.6rem; left: 1.6rem; }
-.tick--tr { top: 1.6rem; right: 1.6rem; }
+.hero .tick--tl { top: 1.6rem; left: 1.6rem; }
+.hero .tick--tr { top: 1.6rem; right: 1.6rem; }
 
-/* Fios pendurados. Cada faixa de opacidade é um path próprio —
-   é a variação de tom que faz o conjunto não virar uma trama. */
+/* ===== FIOS DE COTA =====
+   Ancorados na base das seções; desenham-se de cima para baixo
+   quando o PAI entra na tela. Cada faixa de opacidade é um path
+   próprio — a variação de tom impede a trama. */
 .drip-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
 
 .drips {
@@ -241,9 +260,8 @@ em { font-style: italic; }
     color: var(--ink);
     opacity: 0.85;
     pointer-events: none;
-    /* Os fios são desenhados de cima para baixo quando a seção entra */
     clip-path: inset(0 0 100% 0);
-    transition: clip-path 1.6s var(--ease-out) 0.15s;
+    transition: clip-path var(--t-draw) var(--ease) 0.15s;
 }
 .drips.drawn { clip-path: inset(0 0 0 0); }
 .no-js .drips { clip-path: none; }
@@ -256,8 +274,6 @@ em { font-style: italic; }
 .section--ink .drips { color: var(--paper); opacity: 0.4; }
 
 @media (max-width: 900px) {
-    /* Margem estreita: só o conjunto pequeno, e bem apagado, para
-       não passar por baixo do texto. */
     .drips        { opacity: 0.5; height: 30%; }
     .drips--left  { width: clamp(70px, 20vw, 110px); left: 1.5%; }
     .drips--right { width: clamp(50px, 14vw, 84px); right: 1.5%; }
@@ -271,7 +287,7 @@ em { font-style: italic; }
     background: var(--paper);
     border-bottom: 1px solid var(--paper-3);
     transform: translateY(-100%);
-    transition: transform 0.35s var(--ease-out);
+    transition: transform var(--t-move) var(--ease);
 }
 .topbar.visible { transform: translateY(0); }
 
@@ -305,14 +321,14 @@ em { font-style: italic; }
 .nav-link {
     position: relative;
     font-family: var(--font-display);
-    font-size: 0.68rem;
+    font-size: var(--fs-label);
     font-weight: 600;
     letter-spacing: 3px;
     text-transform: uppercase;
     color: var(--ink-3);
     text-decoration: none;
     padding: 0.4rem 0;
-    transition: color 0.25s ease;
+    transition: color var(--t-move) ease;
 }
 .nav-link::after {
     content: '';
@@ -322,14 +338,14 @@ em { font-style: italic; }
     background: var(--red);
     transform: scaleX(0);
     transform-origin: left;
-    transition: transform 0.3s var(--ease-out);
+    transition: transform var(--t-move) var(--ease);
 }
 .nav-link:hover { color: var(--ink); }
 .nav-link.active { color: var(--red); }
 .nav-link:hover::after,
 .nav-link.active::after { transform: scaleX(1); }
 
-/* Marcador de item novo */
+/* Marcador de item novo — ponto parado; parado já comunica */
 .nav-link--new::before {
     content: '';
     position: absolute;
@@ -353,7 +369,7 @@ em { font-style: italic; }
     width: 16px; height: 1.5px;
     margin: 0 auto;
     background: var(--ink-2);
-    transition: transform 0.3s, opacity 0.3s;
+    transition: transform var(--t-move) var(--ease), opacity var(--t-move) ease;
 }
 .nav-toggle span + span { margin-top: 4px; }
 .nav-toggle.open span:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
@@ -373,7 +389,7 @@ em { font-style: italic; }
         opacity: 0;
         pointer-events: none;
         transform: translateY(-8px);
-        transition: opacity 0.25s ease, transform 0.3s var(--ease-out);
+        transition: opacity var(--t-move) ease, transform var(--t-move) var(--ease);
     }
     .topbar.menu-open .nav-links {
         opacity: 1;
@@ -385,61 +401,77 @@ em { font-style: italic; }
         padding: 0.8rem var(--space-gutter);
     }
     .nav-link::after { left: var(--space-gutter); right: auto; width: 24px; }
-    .nav-link--new::before { right: auto; left: calc(var(--space-gutter) + 4.2rem); top: 0.9rem; }
+    .nav-link--new::before { right: auto; left: calc(var(--space-gutter) + 4.6rem); top: 0.9rem; }
 }
 
-/* ===== ANIMAÇÕES DE ENTRADA ===== */
+/* ============================================================
+   ENTRADAS — dois mecanismos, um vocabulário
+   .rise       : entrada de carga (hero), delay por --dl inline.
+   .reveal     : entrada por scroll, um por BLOCO compositivo.
+   .reveal-list: a LISTA é observada; filhos escalonam por --n
+                 (teto de 4 passos).
+   .reveal--wipe: imagem grande revelada por limpeza (o PAI é
+                 observado — lei do observer).
+   ============================================================ */
+@keyframes riseIn {
+    from { opacity: 0; transform: translateY(var(--rise)); }
+    to   { opacity: 1; transform: none; }
+}
+/* Só o "from": o "to" é o estado natural do elemento — depois da
+   animação nada segura transform, e os hovers ficam livres. */
+@keyframes riseFrom {
+    from { opacity: 0; transform: translateY(var(--rise)); }
+}
+
 .rise {
     opacity: 0;
-    animation: riseUp 0.8s var(--ease-out) forwards;
-    animation-delay: calc(0.1s + var(--i, 0) * 0.1s);
-}
-.hero-text .rise:nth-child(1) { --i: 0; }
-.hero-text .rise:nth-child(2) { --i: 1; }
-.hero-text .rise:nth-child(3) { --i: 1; }
-.hero-text .rise:nth-child(4) { --i: 2; }
-.hero-text .rise:nth-child(5) { --i: 3; }
-.hero-text .rise:nth-child(6) { --i: 3; }
-.hero-text .rise:nth-child(7) { --i: 4; }
-.hero-stage.rise              { --i: 2; }
-
-@keyframes riseUp {
-    from { opacity: 0; transform: translateY(22px); }
-    to   { opacity: 1; transform: translateY(0); }
+    animation: riseIn var(--t-read) var(--ease) var(--dl, 0s) both;
 }
 
-.reveal {
-    opacity: 0;
-    transform: translateY(26px);
-    transition:
-        opacity   0.8s var(--ease-out) var(--d, 0s),
-        transform 0.8s var(--ease-out) var(--d, 0s);
+.reveal { opacity: 0; }
+.reveal.active {
+    opacity: 1;
+    animation: riseFrom var(--t-read) var(--ease) var(--dl, 0s) backwards;
 }
-.reveal.active { opacity: 1; transform: translateY(0); }
-.no-js .reveal { opacity: 1; transform: none; }
 
-/* Variante para imagem: em vez de subir, é revelada de baixo para cima,
-   como uma folha saindo da prensa. */
+.reveal-list > * { opacity: 0; }
+.reveal-list.active > * {
+    opacity: 1;
+    animation: riseFrom var(--t-read) var(--ease) backwards;
+    animation-delay: calc(min(var(--n, 0), 3) * var(--stagger));
+}
+
+.no-js .reveal,
+.no-js .reveal-list > * { opacity: 1; animation: none; }
+
+/* Imagem grande: em vez de subir, é revelada de baixo para cima,
+   como folha saindo da prensa. */
 .reveal--wipe {
     opacity: 1;
-    transform: none;
+    animation: none;
     clip-path: inset(0 0 100% 0);
-    transition: clip-path 1.1s var(--ease-out) var(--d, 0s);
+    transition: clip-path var(--t-press) var(--ease) var(--dl, 0s);
 }
 .reveal--wipe.active { clip-path: inset(0 0 0 0); }
 .no-js .reveal--wipe { clip-path: none; }
 
-/* O arco cresce do rodapé da seção */
-.arch {
-    transform: scaleY(0.04);
-    transition: transform 1.2s var(--ease-out) 0.1s;
+/* O fio dos cabeçalhos se estende sozinho */
+.sec-rule {
+    flex: 1;
+    height: 1px;
+    background: var(--ink-4);
+    opacity: 0.5;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--t-press) var(--ease) 0.2s;
 }
-.arch.grown, .no-js .arch { transform: scaleY(1); }
+.reveal.active .sec-rule,
+.no-js .sec-rule { transform: scaleX(1); }
 
 /* ===== TIPOGRAFIA DE APOIO ===== */
 .eyebrow {
     font-family: var(--font-display);
-    font-size: 0.66rem;
+    font-size: var(--fs-label-s);
     font-weight: 700;
     letter-spacing: 4px;
     text-transform: uppercase;
@@ -489,24 +521,29 @@ em { font-style: italic; }
 .pull cite {
     display: block;
     font-family: var(--font-display);
-    font-size: 0.62rem;
+    font-size: var(--fs-label-s);
     font-style: normal;
     font-weight: 600;
     letter-spacing: 3px;
     text-transform: uppercase;
     color: var(--red);
 }
+/* A voz maior — no máximo UMA por seção */
+.pull--lg p {
+    font-size: clamp(1.25rem, 1.05rem + 1.2vw, 1.9rem);
+    line-height: 1.45;
+    max-width: 26ch;
+}
 
 /* ===== BOTÕES ===== */
 .btn-solid,
-.btn-line,
-.btn-link {
+.btn-line {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.6rem;
     font-family: var(--font-display);
-    font-size: 0.68rem;
+    font-size: var(--fs-label);
     font-weight: 700;
     letter-spacing: 3px;
     text-transform: uppercase;
@@ -514,32 +551,49 @@ em { font-style: italic; }
     padding: 0.95rem 1.9rem;
     border: 1px solid transparent;
     cursor: pointer;
-    transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+    transition: background var(--t-move) ease, color var(--t-move) ease, border-color var(--t-move) ease;
 }
-.btn-solid {
-    background: var(--red);
-    color: var(--paper);
-}
-.btn-solid:hover { background: var(--red-deep); }
-.btn-solid--wide { width: 100%; }
 
-.btn-line {
-    border-color: var(--ink);
-    color: var(--ink);
+/* A tinta entra por baixo no hover */
+.btn-solid { position: relative; overflow: hidden; isolation: isolate; background: var(--red); color: var(--paper); }
+.btn-solid::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--red-deep);
+    transform: scaleY(0);
+    transform-origin: 50% 100%;
+    transition: transform var(--t-move) var(--ease);
 }
-.btn-line:hover { background: var(--ink); color: var(--paper); }
+.btn-solid:hover::before { transform: scaleY(1); }
 
-.btn-link {
-    padding: 0.95rem 0.4rem;
-    color: var(--ink-2);
-    text-decoration: underline;
-    text-underline-offset: 5px;
-    text-decoration-thickness: 1px;
-    text-decoration-color: var(--paper-3);
+.btn-line { position: relative; overflow: hidden; isolation: isolate; border-color: var(--ink); color: var(--ink); }
+.btn-line::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--ink);
+    transform: scaleY(0);
+    transform-origin: 50% 100%;
+    transition: transform var(--t-move) var(--ease);
 }
-.btn-link:hover { color: var(--red); text-decoration-color: var(--red); }
+.btn-line:hover::before { transform: scaleY(1); }
+.btn-line:hover { color: var(--paper); }
 
-/* ===== HERO ===== */
+/* Variante para fundo de nanquim */
+.btn-line--paper { border-color: var(--paper); color: var(--paper); }
+.btn-line--paper::before { background: var(--paper); }
+.btn-line--paper:hover { color: var(--ink); }
+
+/* ============================================================
+   HERO — a cena dirigida
+   t=0 arco cresce + muralha surge · .2s eyebrow · .38/.47/.56s
+   as linhas do título · .65s+ o subtítulo seca · .5s o livro ·
+   .8s assinatura · .92s ações · 1.5s o selo carimba · 2.1s o
+   indicador. Depois, silêncio.
+   ============================================================ */
 .hero {
     position: relative;
     min-height: 100vh;
@@ -563,61 +617,41 @@ em { font-style: italic; }
     align-items: center;
 }
 
-/* A paisagem nasce da borda inferior e se dissolve no papel.
-   z-index 0 para as cruzetas e os fios continuarem por cima. */
+/* A muralha nasce da borda de baixo e se dissolve no papel.
+   O céu da pintura é transparente: o papel é o céu. */
 .hero-scape {
     position: absolute;
     left: 0; right: 0; bottom: 0;
-    height: 48%;
+    height: 50%;
     z-index: 0;
     pointer-events: none;
+    animation: scapeIn var(--t-draw) var(--ease) both;
+}
+@keyframes scapeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
 }
 .hero-scape img {
     width: 100%; height: 100%;
     object-fit: cover;
-    /* Empurra o portão (lado direito, cheio) para trás do livro e deixa
-       a estrada vazia embaixo do texto. */
+    /* Portão à direita, atrás do livro; a estrada vazia sob o texto */
     object-position: 64% bottom;
     filter: grayscale(1) contrast(1.04);
-    opacity: 0.36;
-    -webkit-mask-image: linear-gradient(to top, #000 26%, rgba(0,0,0,0.7) 58%, transparent 96%);
-    mask-image: linear-gradient(to top, #000 26%, rgba(0,0,0,0.7) 58%, transparent 96%);
+    opacity: 0.5;
+    -webkit-mask-image: linear-gradient(to top, #000 30%, rgba(0,0,0,0.72) 58%, transparent 94%);
+    mask-image: linear-gradient(to top, #000 30%, rgba(0,0,0,0.72) 58%, transparent 94%);
 }
 
-.hero-text { display: flex; flex-direction: column; align-items: flex-start; }
-
-/* Pílula do marco mais recente */
-.flash {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.7rem;
-    margin-bottom: 1.4rem;
-    padding: 0.4rem 0.95rem;
-    border: 1px solid var(--red);
-    font-family: var(--font-display);
-    font-size: 0.62rem;
-    font-weight: 700;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--red);
-    text-decoration: none;
-    transition: background 0.25s ease, color 0.25s ease;
+.hero-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
-.flash:hover { background: var(--red); color: var(--paper); }
-.flash:hover .flash-dot { background: var(--paper); }
-.flash-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--red);
-    flex-shrink: 0;
-    transition: background 0.25s ease;
-}
-.flash-arrow { transition: transform 0.25s var(--ease-out); }
-.flash:hover .flash-arrow { transform: translateX(3px); }
 
-.hero-text .eyebrow { margin-bottom: 1rem; color: var(--ink-3); }
+.hero-text .eyebrow { margin-bottom: 1.1rem; color: var(--ink-3); }
 
-/* Título do livro: a letra da capa, empilhada e apertada */
+/* Título do livro: a letra da capa, empilhada e apertada.
+   Vermelho chapado, parado — a entrada linha a linha é o gesto. */
 .hero-title {
     font-family: var(--font-book);
     font-size: clamp(2.9rem, 1.2rem + 6.6vw, 5.6rem);
@@ -625,30 +659,12 @@ em { font-style: italic; }
     letter-spacing: 1px;
     color: var(--red);
     margin-bottom: 1.1rem;
-    /* Varredura lenta de tinta mais clara atravessando as letras */
-    background: linear-gradient(
-        100deg,
-        var(--red) 0 42%,
-        #C2453A   49%,
-        #D25A4C   52%,
-        #C2453A   55%,
-        var(--red) 62% 100%
-    );
-    background-size: 280% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    /* riseUp junto: .rise deixa a opacidade em 0 e declarar só a varredura
-       sobrescreveria a entrada — o título nunca apareceria. */
-    animation:
-        riseUp 0.8s var(--ease-out) 0.2s forwards,
-        inkSweep 11s linear 2.4s infinite;
 }
-@keyframes inkSweep {
-    0%   { background-position: 140% center; }
-    100% { background-position: -40% center; }
+.hero-title span {
+    display: block;
+    opacity: 0;
+    animation: riseIn var(--t-read) var(--ease) var(--dl, 0s) both;
 }
-.hero-title span { display: block; }
 
 .hero-sub {
     font-family: var(--font-display);
@@ -657,32 +673,28 @@ em { font-style: italic; }
     letter-spacing: 6px;
     text-transform: uppercase;
     color: var(--ink);
-    margin-bottom: 1.4rem;
+    margin-bottom: 1.6rem;
 }
-/* Ignição letra a letra (JS envolve em .char) */
-.hero-sub .char { color: var(--ink-4); transition: color 0.4s ease; }
-.hero-sub .char.lit { color: var(--ink); }
-
-.hero-desc {
-    font-size: clamp(1rem, 0.95rem + 0.3vw, 1.12rem);
-    line-height: 1.8;
-    color: var(--ink-2);
-    margin-bottom: 1.3rem;
-    max-width: 34ch;
+/* Tinta secando: da esquerda para a direita, uma vez.
+   JS envolve as letras em .char com --n e liga .lit. */
+.js .hero-sub .char {
+    color: var(--ink-4);
+    transition: color 480ms var(--ease);
+    transition-delay: calc(650ms + var(--n, 0) * 40ms);
 }
-.hero-desc em { color: var(--red); font-style: italic; }
+.js .hero-sub.lit .char { color: var(--ink); }
 
 .hero-attr {
     display: flex;
     align-items: center;
     gap: 0.9rem;
     font-family: var(--font-display);
-    font-size: 0.66rem;
+    font-size: var(--fs-label-s);
     font-weight: 600;
     letter-spacing: 4px;
     text-transform: uppercase;
     color: var(--red);
-    margin-bottom: 1.9rem;
+    margin-bottom: 2rem;
 }
 .hero-attr-rule {
     width: 32px; height: 1px;
@@ -704,39 +716,55 @@ em { font-style: italic; }
     justify-content: center;
     min-height: 27rem;
 }
-/* Coluna de sangue: nasce lá em cima e só termina onde a section termina */
+.rise--book {
+    animation-name: bookIn;
+    animation-duration: var(--t-press);
+}
+@keyframes bookIn {
+    from { opacity: 0; transform: translateY(24px) scale(0.985); }
+    to   { opacity: 1; transform: none; }
+}
+
+/* Coluna de sangue: nasce no alto e termina onde a section termina */
 .arch--hero {
     top: 20%;
     bottom: 0;
     right: 7%;
     width: min(27vw, 25rem);
     z-index: 0;
-    transform-origin: 50% 100%;
 }
 .hero-book {
     position: relative;
     z-index: 1;
     width: clamp(300px, 44vw, 560px);
-    transition: transform 0.3s var(--ease-out);
+    will-change: transform;
 }
 .hero-book-img {
     width: 100%; height: auto;
     filter: drop-shadow(0 26px 34px rgba(20, 19, 18, 0.42));
 }
 
-/* Selo de etapa concluída */
+/* Selo de etapa concluída — carimba uma vez e repousa */
 .stamp {
     position: absolute;
     right: 0; bottom: 0.5rem;
     z-index: 2;
-    transform: rotate(-1.2deg);
-    animation: stampIn 0.6s var(--ease-out) 1.1s backwards;
     display: flex;
     align-items: center;
     gap: 0.7rem;
     padding: 0.7rem 1.1rem;
     background: var(--ink);
     color: var(--paper);
+    text-decoration: none;
+    transform: rotate(-1.2deg);
+    animation: stampIn 480ms var(--ease) 1.5s both;
+    transition: background var(--t-move) ease;
+}
+.stamp:hover { background: var(--red-deep); }
+@keyframes stampIn {
+    0%   { opacity: 0; transform: rotate(-4deg) scale(1.18); }
+    60%  { opacity: 1; transform: rotate(-1.2deg) scale(0.98); }
+    100% { opacity: 1; transform: rotate(-1.2deg) scale(1); }
 }
 .stamp-check {
     width: 22px; height: 22px;
@@ -752,7 +780,7 @@ em { font-style: italic; }
 .stamp-text { display: flex; flex-direction: column; line-height: 1.35; }
 .stamp-text b {
     font-family: var(--font-display);
-    font-size: 0.64rem;
+    font-size: var(--fs-label-s);
     font-weight: 700;
     letter-spacing: 2.5px;
     text-transform: uppercase;
@@ -764,27 +792,34 @@ em { font-style: italic; }
     font-style: italic;
 }
 
-@keyframes stampIn {
-    0%   { opacity: 0; transform: rotate(-6deg) scale(1.5); }
-    60%  { opacity: 1; transform: rotate(-1.2deg) scale(0.97); }
-    100% { opacity: 1; transform: rotate(-1.2deg) scale(1); }
-}
-
+/* Indicador de rolagem: aparece, pulsa 3 vezes, repousa.
+   JS o esconde no primeiro scroll. */
 .hero-scroll {
     position: absolute;
     bottom: 1.8rem; left: 50%;
     transform: translateX(-50%);
     z-index: 2;
+    opacity: 0;
+    animation: scrollIn var(--t-read) var(--ease) 2.1s forwards;
+}
+@keyframes scrollIn {
+    to { opacity: 1; }
 }
 .hero-scroll span {
     display: block;
     width: 1px; height: 52px;
     background: linear-gradient(to bottom, var(--red), transparent);
-    animation: scrollPulse 2.2s ease-in-out infinite;
+    opacity: 0.5;
+    animation: scrollPulse 2.2s ease-in-out 2.7s 3;
 }
 @keyframes scrollPulse {
-    0%,100% { opacity: 0.35; transform: scaleY(0.9); }
-    50%     { opacity: 1;    transform: scaleY(1); }
+    0%, 100% { opacity: 0.35; transform: scaleY(0.9); }
+    50%      { opacity: 1;    transform: scaleY(1); }
+}
+.hero-scroll.hidden {
+    animation: none;
+    opacity: 0;
+    transition: opacity var(--t-move) ease;
 }
 
 @media (max-width: 900px) {
@@ -793,51 +828,16 @@ em { font-style: italic; }
         gap: 2.5rem;
         padding: 6rem var(--space-gutter) 4.5rem;
     }
-    .rule-v--2 { display: none; }
-    /* No mobile o livro desce para cima da paisagem — encolhe a faixa
-       e alivia para não brigar com ele. */
-    .hero-scape { height: 32%; }
-    .hero-scape img { opacity: 0.26; object-position: 72% bottom; }
+    /* No mobile o livro desce para cima da paisagem — encolhe a
+       faixa e alivia para não brigar com ele. */
+    .hero-scape { height: 34%; }
+    .hero-scape img { opacity: 0.32; object-position: 72% bottom; }
     .hero-stage { min-height: 0; }
     .hero-book  { width: min(86vw, 430px); }
-    .arch--hero { width: min(60%, 15rem); height: 78%; top: -6%; }
+    /* Atrás do LIVRO, nunca atrás do título — vermelho sobre
+       vermelho apaga o nome do livro. */
+    .arch--hero { width: min(64%, 17rem); height: 44%; top: auto; bottom: 0; right: 4%; }
     .stamp { right: -0.4rem; bottom: -1.2rem; }
-}
-
-/* ===== MARQUEE — faixa de nanquim ===== */
-.marquee {
-    position: relative;
-    z-index: 3;
-    overflow: hidden;
-    background: var(--ink);
-    padding: 0.85rem 0;
-}
-.marquee-track {
-    display: flex;
-    width: max-content;
-    gap: 2.5rem;
-    animation: marqueeSlide 38s linear infinite;
-}
-.marquee:hover .marquee-track { animation-play-state: paused; }
-.marquee-group {
-    display: flex;
-    align-items: center;
-    gap: 2.5rem;
-    flex-shrink: 0;
-}
-.marquee-group span {
-    font-family: var(--font-display);
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    color: var(--paper);
-    white-space: nowrap;
-}
-.marquee-sep { color: var(--red-lift) !important; }
-/* desloca exatamente um período (grupo + gap) */
-@keyframes marqueeSlide {
-    to { transform: translateX(calc(-50% - 1.25rem)); }
 }
 
 /* ===== SEÇÕES ===== */
@@ -868,31 +868,9 @@ em { font-style: italic; }
     gap: 1.4rem;
     margin-bottom: 1.6rem;
 }
-.sec-meta--mid { margin: clamp(3rem, 2rem + 2vw, 4.5rem) 0 2rem; }
-.sec-rule {
-    flex: 1;
-    height: 1px;
-    background: var(--ink-4);
-    opacity: 0.5;
-}
-.tally {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    flex-shrink: 0;
-    font-family: var(--font-display);
-    font-size: 0.62rem;
-    font-weight: 700;
-    letter-spacing: 2.5px;
-    text-transform: uppercase;
-    color: var(--paper);
-    background: var(--red);
-    padding: 0.32rem 0.8rem;
-    white-space: nowrap;
-}
-.tally svg { width: 0.7rem; height: 0.7rem; }
 
-/* Display de seção: caixa alta empilhada, vermelha, entrelinha curta */
+/* Display de seção — TRÊS degraus. O gigante é raro de propósito:
+   só A História e A Capa. O bicolor vermelho/nanquim vale nos três. */
 .sec-title {
     font-family: var(--font-display);
     font-size: clamp(2.4rem, 1.3rem + 4.6vw, 5.2rem);
@@ -907,11 +885,25 @@ em { font-style: italic; }
     font-style: normal;
     color: var(--ink);
 }
+
+.sec-title--m {
+    font-size: clamp(1.9rem, 1.3rem + 2.3vw, 3.2rem);
+    line-height: 1.02;
+}
+
+.sec-title--s {
+    font-size: clamp(1.35rem, 1.15rem + 1vw, 1.9rem);
+    line-height: 1.15;
+    letter-spacing: 1.5px;
+}
+.sec-head--row { margin-bottom: 2.4rem; }
+.sec-head--row .sec-meta { margin-bottom: 1rem; }
+
 .section--ink .sec-title    { color: var(--red-lift); }
 .section--ink .sec-title em { color: var(--paper); }
 .section--ink .sec-rule     { background: var(--ink-3); opacity: 1; }
 .section--ink .eyebrow      { color: var(--red-lift); }
-.section--ink .text-body    { color: #C3BCB1; }
+.section--ink .text-body    { color: var(--ink-body); }
 .section--ink strong,
 .section--ink b             { color: var(--red-lift); }
 .section--ink .pull         { border-left-color: var(--red-lift); }
@@ -919,13 +911,30 @@ em { font-style: italic; }
 .section--ink .pull cite    { color: var(--red-lift); }
 .section--ink .has-dropcap::first-letter { color: var(--red-lift); }
 
+/* Sub-cabeçalho de bloco (dentro de seção): nanquim, não vermelho —
+   não compete com o sec-title. */
+.sub-head {
+    display: flex;
+    align-items: center;
+    gap: 1.4rem;
+    margin: clamp(3.2rem, 2.4rem + 2vw, 5rem) 0 1.8rem;
+}
+.sub-head h3 {
+    font-family: var(--font-display);
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--ink);
+    white-space: nowrap;
+}
+
 /* ===== NOTAS (fileiras editoriais com fio) ===== */
 .notes {
     list-style: none;
     border-top: 1px solid var(--paper-3);
     margin-top: 0.5rem;
 }
-
 .note {
     padding: 1.3rem 0;
     border-bottom: 1px solid var(--paper-3);
@@ -947,14 +956,71 @@ em { font-style: italic; }
     line-height: 1.75;
     color: var(--ink-2);
 }
-.section--ink .notes      { border-top-color: #2E2A27; }
-.section--ink .note       { border-bottom-color: #2E2A27; }
-.section--ink .note h3    { color: var(--red-lift); }
-.section--ink .note p     { color: #C3BCB1; }
 
 @media (max-width: 640px) {
     .note { grid-template-columns: 1fr; gap: 0.5rem; }
 }
+
+/* ============================================================
+   A HISTÓRIA — a quarta capa em lauda de prensa
+   ============================================================ */
+.story { max-width: 62ch; }
+
+.story-open {
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: clamp(1.3rem, 1.1rem + 1.3vw, 1.9rem);
+    line-height: 1.5;
+    color: var(--paper);
+    max-width: 34ch;
+    margin-bottom: 2.2rem;
+}
+
+.story-body p {
+    font-size: 1.02rem;
+    line-height: 1.85;
+    color: var(--ink-body);
+    max-width: 58ch;
+    margin-bottom: 1.4rem;
+}
+
+/* O ornamento impresso na própria quarta capa: traço, losango, traço */
+.story-mark {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 2.6rem 0;
+}
+.story-mark span {
+    width: 44px; height: 1px;
+    background: var(--ink-3);
+}
+.story-mark i {
+    width: 7px; height: 7px;
+    background: var(--red-lift);
+    transform: rotate(45deg);
+}
+
+.story-final {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: var(--paper);
+    margin-bottom: 1.4rem;
+}
+
+/* O único display fora de sec-title em toda a página — por isso pesa */
+.story-climax {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.5rem, 1.1rem + 2vw, 2.6rem);
+    line-height: 1.12;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--red-lift);
+    max-width: 16ch;
+}
+
+.story-actions { margin-top: 2.8rem; }
 
 /* ===== A CAPA ===== */
 .capa-reveal {
@@ -982,28 +1048,40 @@ em { font-style: italic; }
 .capa-body { position: relative; }
 /* :not(.arch) — o arco precisa continuar absoluto para ir de -2.5rem até o rodapé */
 .capa-body > *:not(.arch) { position: relative; z-index: 1; }
-/* Arco largo atrás da capa que estreita numa perna e segue até o fim da
-   section. Sem o degrau, a coluna cruzaria as legendas e o texto ficaria
-   ilegível sobre o vermelho. */
+/* Arco largo atrás da capa que estreita numa perna e segue até o
+   fim da section. O degrau é em PIXELS, ancorado na altura da
+   imagem da capa (~526px): porcentagem escorrega quando a seção
+   cresce e o vermelho invade as legendas. */
 .arch--capa {
     top: -2.5rem;
     bottom: 0;
     left: -12%;
     width: min(320px, 30%);
     z-index: 0 !important;
-    transform-origin: 50% 100%;
-    /* O degrau cai logo abaixo da legenda da capa (~32% da altura do arco) */
-    clip-path: polygon(0 0, 100% 0, 100% 35%, 30% 35%, 30% 100%, 0 100%);
+    clip-path: polygon(0 0, 100% 0, 100% 500px, 30% 500px, 30% 100%, 0 100%);
 }
 @media (max-width: 880px) {
-    .arch--capa { width: min(260px, 62%); left: -22%; }
+    /* Coluna única: o arco vira moldura só do topo da capa e
+       termina antes do texto — sem perna. */
+    .arch--capa {
+        width: min(260px, 62%);
+        left: -22%;
+        bottom: auto;
+        height: 460px;
+        clip-path: none;
+    }
 }
+
+/* A capa levanta do papel e a sombra se abre junto */
 .capa-frame .zoom img {
     width: 100%; height: auto;
     box-shadow: 0 20px 44px rgba(20, 19, 18, 0.34);
-    transition: transform 0.45s var(--ease-out);
+    transition: transform var(--t-read) var(--ease), box-shadow var(--t-read) var(--ease);
 }
-.capa-frame .zoom:hover img { transform: translateY(-5px); }
+.capa-frame .zoom:hover img {
+    transform: translateY(-10px) rotate(-0.5deg);
+    box-shadow: 0 34px 64px rgba(20, 19, 18, 0.42);
+}
 
 .zoom-hint {
     position: absolute;
@@ -1015,14 +1093,14 @@ em { font-style: italic; }
     padding: 0.45rem 0.9rem;
     background: var(--ink);
     font-family: var(--font-display);
-    font-size: 0.6rem;
+    font-size: var(--fs-label-s);
     font-weight: 700;
     letter-spacing: 2.5px;
     text-transform: uppercase;
     color: var(--paper);
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.25s ease, transform 0.25s var(--ease-out);
+    transition: opacity var(--t-move) ease, transform var(--t-move) var(--ease);
 }
 .zoom-hint svg { width: 0.85rem; height: 0.85rem; }
 .zoom:hover .zoom-hint,
@@ -1043,7 +1121,7 @@ em { font-style: italic; }
     background: var(--ink);
     color: var(--paper);
     font-family: var(--font-display);
-    font-size: 0.6rem;
+    font-size: var(--fs-label-s);
     font-weight: 700;
     letter-spacing: 2.5px;
     text-transform: uppercase;
@@ -1054,50 +1132,26 @@ em { font-style: italic; }
     position: relative;
     z-index: 1;
     margin-top: 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
     font-family: var(--font-display);
-    font-size: 0.6rem;
+    font-size: var(--fs-label-s);
     font-weight: 600;
     letter-spacing: 3px;
     text-transform: uppercase;
     color: var(--ink-3);
 }
+/* Crédito visível é linguagem de obra impressa */
+.credits-line { color: var(--ink); }
 
-.capa-side { display: flex; flex-direction: column; gap: 1.6rem; }
-
-/* Créditos da arte */
-.credits {
+.capa-side {
     display: flex;
-    flex-wrap: wrap;
-    gap: 2.4rem;
-    padding: 1rem 0;
-    border-top: 1px solid var(--paper-3);
-    border-bottom: 1px solid var(--paper-3);
-}
-.credits dt {
-    font-family: var(--font-display);
-    font-size: 0.58rem;
-    font-weight: 700;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--red);
-    margin-bottom: 0.2rem;
-}
-.credits dd {
-    font-size: 0.98rem;
-    color: var(--ink);
+    flex-direction: column;
+    gap: 1.2rem;
 }
 
 /* --- A pintura completa --- */
-.credit-inline {
-    flex-shrink: 0;
-    font-family: var(--font-display);
-    font-size: 0.6rem;
-    font-weight: 600;
-    letter-spacing: 2.5px;
-    text-transform: uppercase;
-    color: var(--ink-3);
-    white-space: nowrap;
-}
 .artwork { position: relative; }
 /* Faixa recortada — a pintura inteira fica para o lightbox */
 .artwork-shot {
@@ -1114,10 +1168,11 @@ em { font-style: italic; }
     object-fit: cover;
     object-position: 62% 58%;
 }
-/* A cor mora embaixo e é revelada da esquerda para a direita no hover */
+/* A cor mora embaixo e é revelada da esquerda para a direita:
+   no desktop pelo mouse, no mobile pela rolagem (scrub). */
 .artwork-color {
     clip-path: inset(0 100% 0 0);
-    transition: clip-path 1.1s var(--ease-out);
+    transition: clip-path var(--t-press) var(--ease);
 }
 .artwork .zoom:hover .artwork-color,
 .artwork .zoom:focus-visible .artwork-color { clip-path: inset(0 0 0 0); }
@@ -1150,25 +1205,37 @@ em { font-style: italic; }
     background: var(--paper-2);
     border: 1px solid var(--paper-3);
     overflow: hidden;
-    transition: background 0.3s ease, border-color 0.3s ease;
+    transition: background var(--t-move) ease, border-color var(--t-move) ease, transform var(--t-move) var(--ease);
 }
 .plate .zoom img {
     width: auto; height: auto;
     max-width: 100%; max-height: 100%;
     object-fit: contain;
     filter: drop-shadow(0 10px 18px rgba(20, 19, 18, 0.3));
-    transition: transform 0.4s var(--ease-out);
+    transition: transform var(--t-move) var(--ease);
 }
-.plate .zoom:hover { background: var(--paper-3); border-color: var(--ink-4); }
+.plate .zoom:hover {
+    background: var(--paper-3);
+    border-color: var(--ink-4);
+    transform: translateY(-4px);
+    transition-duration: var(--t-touch);
+}
 .plate .zoom:hover img { transform: scale(1.05); }
 .plate-cap {
     font-family: var(--font-display);
-    font-size: 0.6rem;
+    font-size: var(--fs-label-s);
     font-weight: 600;
     letter-spacing: 2.5px;
     text-transform: uppercase;
     color: var(--ink-3);
 }
+.plate-cap a {
+    color: var(--red);
+    text-decoration: none;
+    border-bottom: 1px solid var(--paper-3);
+    transition: border-color var(--t-move) ease;
+}
+.plate-cap a:hover { border-color: var(--red); }
 
 /* --- Ponte para a próxima etapa --- */
 .next-step {
@@ -1180,7 +1247,7 @@ em { font-style: italic; }
     background: var(--ink);
     color: var(--paper);
     text-decoration: none;
-    transition: background 0.25s ease;
+    transition: background var(--t-move) ease;
 }
 .next-step:hover { background: var(--red-deep); }
 .next-step-text { display: flex; flex-direction: column; gap: 0.25rem; }
@@ -1191,15 +1258,15 @@ em { font-style: italic; }
     letter-spacing: 2px;
     text-transform: uppercase;
     color: var(--red-lift);
-    transition: color 0.25s ease;
+    transition: color var(--t-move) ease;
 }
 .next-step:hover .next-step-text b { color: var(--paper); }
-.next-step-text span { font-size: 0.9rem; color: #C3BCB1; }
+.next-step-text span { font-size: 0.9rem; color: var(--ink-body); }
 .next-step-arrow {
     margin-left: auto;
     font-size: 1.3rem;
     color: var(--red-lift);
-    transition: transform 0.25s var(--ease-out), color 0.25s ease;
+    transition: transform var(--t-move) var(--ease), color var(--t-move) ease;
 }
 .next-step:hover .next-step-arrow { transform: translateX(6px); color: var(--paper); }
 
@@ -1209,12 +1276,11 @@ em { font-style: italic; }
     .plates      { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 520px) {
-    .tally { display: none; }
     .next-step { flex-wrap: wrap; gap: 1rem; }
     .next-step-arrow { display: none; }
 }
 
-/* ===== LANÇAMENTO ===== */
+/* ===== A EDIÇÃO ===== */
 .launch-layout {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1232,7 +1298,7 @@ em { font-style: italic; }
 }
 .tracker-title {
     font-family: var(--font-display);
-    font-size: 0.7rem;
+    font-size: var(--fs-label);
     font-weight: 700;
     letter-spacing: 4px;
     text-transform: uppercase;
@@ -1249,27 +1315,31 @@ em { font-style: italic; }
 }
 .tracker-count {
     font-family: var(--font-display);
-    font-size: 0.64rem;
+    font-size: var(--fs-label-s);
     font-weight: 600;
     letter-spacing: 2.5px;
     text-transform: uppercase;
     color: var(--ink-3);
 }
 .tracker-count b { font-size: 1rem; color: var(--red); }
+
+/* Barras em transform (zero reflow), preenchem em cascata */
 .tracker-meter {
     display: block;
     height: 3px;
     background: var(--paper-3);
 }
-.tracker-meter i {
+.tracker-meter i,
+.step-bar i {
     display: block;
     height: 100%;
-    width: 0;
     background: var(--red);
-    transition: width 1.1s var(--ease-out) 0.25s;
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    transition: transform var(--t-press) var(--ease);
 }
-.tracker.active .tracker-meter i { width: var(--w, 0%); }
-.no-js .tracker-meter i { width: var(--w, 0%); }
+.tracker.active .tracker-meter i,
+.no-js .tracker-meter i { transform: scaleX(var(--w-n, 0)); }
 
 .steps { list-style: none; display: flex; flex-direction: column; gap: 1.1rem; }
 .step {
@@ -1277,7 +1347,11 @@ em { font-style: italic; }
     grid-template-columns: 12px 1fr auto;
     gap: 0.3rem 0.9rem;
     align-items: center;
+    transition: transform var(--t-move) var(--ease);
 }
+.step:hover { transform: translateX(4px); transition-duration: var(--t-touch); }
+.step:hover .step-label { color: var(--red); }
+
 .step-mark {
     grid-row: 1 / 3;
     align-self: start;
@@ -1296,20 +1370,13 @@ em { font-style: italic; }
     background: transparent;
     transform: rotate(45deg);
 }
-/* Etapa recém-concluída: pulso comemorativo */
-.step--fresh .step-mark { animation: freshPop 2.8s ease-out infinite; }
-@keyframes freshPop {
-    0%   { box-shadow: 0 0 0 0 rgba(var(--red-rgb), 0.5); }
-    70%  { box-shadow: 0 0 0 9px rgba(var(--red-rgb), 0); }
-    100% { box-shadow: 0 0 0 0 rgba(var(--red-rgb), 0); }
-}
 
-.step-label { font-size: 0.94rem; color: var(--ink); }
+.step-label { font-size: 0.94rem; color: var(--ink); transition: color var(--t-move) ease; }
 .step-label a {
     color: var(--ink);
     text-decoration: none;
     border-bottom: 1px solid var(--paper-3);
-    transition: color 0.25s ease, border-color 0.25s ease;
+    transition: color var(--t-move) ease, border-color var(--t-move) ease;
 }
 .step-label a span { font-size: 0.78em; color: var(--red); }
 .step-label a:hover { color: var(--red); border-color: var(--red); }
@@ -1317,7 +1384,7 @@ em { font-style: italic; }
 
 .step-state {
     font-family: var(--font-display);
-    font-size: 0.58rem;
+    font-size: var(--fs-label-s);
     font-weight: 700;
     letter-spacing: 2px;
     text-transform: uppercase;
@@ -1333,16 +1400,13 @@ em { font-style: italic; }
     height: 2px;
     background: var(--paper-3);
     margin-top: 0.35rem;
+    overflow: hidden;
 }
 .step-bar i {
-    display: block;
-    height: 100%;
-    width: 0;
-    background: var(--red);
-    transition: width 1.1s var(--ease-out) 0.25s;
+    transition-delay: calc(0.2s + min(var(--n, 0), 3) * var(--stagger));
 }
-.tracker.active .step-bar i { width: var(--w, 0%); }
-.no-js .step-bar i { width: var(--w, 0%); }
+.tracker.active .step-bar i,
+.no-js .step-bar i { transform: scaleX(var(--w-n, 0)); }
 .step--goal .step-bar {
     background: repeating-linear-gradient(
         90deg,
@@ -1362,7 +1426,7 @@ em { font-style: italic; }
 .after-note b {
     display: block;
     font-family: var(--font-display);
-    font-size: 0.68rem;
+    font-size: var(--fs-label);
     letter-spacing: 2.5px;
     text-transform: uppercase;
     color: var(--red);
@@ -1371,17 +1435,112 @@ em { font-style: italic; }
 
 @media (max-width: 880px) {
     .launch-layout { grid-template-columns: 1fr; gap: 3rem; }
-    .launch-right  { position: static; }
+    /* Quem chega do selo quer o status antes da prosa */
+    .launch-right  { position: static; order: -1; }
 }
 
-/* ===== AUTOR (bloco de nanquim) ===== */
+/* ===== ERRÁWYN ===== */
+
+/* A prancha de arquivo: o mapa impresso no papel do site.
+   multiply funde o branco do papel do mapa com o papel da página
+   (elemento em fluxo — o banding do Chrome era só em camada fixa). */
+.map-plate {
+    position: relative;
+    margin: 0 auto clamp(3rem, 2.4rem + 2vw, 4.5rem);
+}
+.map-plate .zoom {
+    border: 1px solid var(--ink-2);
+    outline: 1px solid var(--ink-2);
+    outline-offset: 4px;
+    overflow: hidden;
+}
+.map-plate .zoom img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 38%;
+    mix-blend-mode: multiply;
+}
+@media (min-width: 881px) {
+    .map-plate .zoom { aspect-ratio: 1.9 / 1; }
+}
+.map-plate .tick { opacity: 0.7; }
+.map-plate .tick--tl { top: -11px; left: -11px; }
+.map-plate .tick--tr { top: -11px; right: -11px; }
+.map-plate .tick--bl { bottom: -11px; left: -11px; }
+.map-plate .tick--br { bottom: -11px; right: -11px; }
+
+.map-plate figcaption {
+    margin-top: 1.1rem;
+    font-family: var(--font-display);
+    font-size: var(--fs-label-s);
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--ink-3);
+}
+
+.wiki-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+}
+.wiki-left { display: flex; flex-direction: column; gap: 1.6rem; align-items: flex-start; }
+
+.chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    list-style: none;
+}
+.chips li {
+    font-family: var(--font-display);
+    font-size: var(--fs-label-s);
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding: 0.42rem 0.85rem;
+    border: 1px solid var(--paper-3);
+    transition: color var(--t-move) ease, border-color var(--t-move) ease, transform var(--t-move) var(--ease);
+}
+.chips li:hover {
+    color: var(--red);
+    border-color: var(--red);
+    transform: translateY(-2px);
+    transition-duration: var(--t-touch);
+}
+
+.wiki-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.6rem;
+    padding: 2rem;
+    background: var(--paper-2);
+    border: 1px solid var(--paper-3);
+}
+.wiki-seal { width: 62px; height: auto; opacity: 0.85; }
+
+@media (max-width: 880px) {
+    .wiki-split { grid-template-columns: 1fr; gap: 2.5rem; }
+}
+
+/* ===== O AUTOR (bloco de nanquim) ===== */
 .author-layout {
     display: grid;
     grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
     gap: clamp(2.5rem, 1rem + 5vw, 5rem);
     align-items: start;
 }
-.author-side { display: flex; flex-direction: column; gap: 2rem; align-items: flex-start; }
+.author-side {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    align-items: flex-start;
+}
 
 /* Retrato dentro do arco — a mesma forma da capa */
 .author-portrait {
@@ -1389,7 +1548,6 @@ em { font-style: italic; }
     width: 100%;
     aspect-ratio: 3 / 4;
 }
-.author-side { position: relative; }
 .arch--author {
     top: -0.9rem;
     bottom: 0;
@@ -1397,9 +1555,8 @@ em { font-style: italic; }
     width: 100%;
     background: var(--red-deep);
     z-index: 0;
-    transform-origin: 50% 100%;
 }
-.author-portrait, .socials { position: relative; z-index: 1; }
+.author-portrait, .author-side .socials { position: relative; z-index: 1; }
 .author-photo {
     position: relative;
     z-index: 1;
@@ -1413,86 +1570,27 @@ em { font-style: italic; }
 .social {
     width: 40px; height: 40px;
     border: 1px solid var(--ink-3);
-    color: #C3BCB1;
+    color: var(--ink-body);
     display: flex;
     align-items: center;
     justify-content: center;
     text-decoration: none;
-    transition: color 0.25s, border-color 0.25s, background 0.25s;
+    transition: color var(--t-move) ease, border-color var(--t-move) ease, background var(--t-move) ease, transform var(--t-move) var(--ease);
 }
 .social svg { width: 16px; height: 16px; }
 .social:hover {
     color: var(--paper);
     background: var(--red);
     border-color: var(--red);
+    transform: translateY(-3px);
+    transition-duration: var(--t-touch);
 }
 
 @media (max-width: 768px) {
     .author-layout { grid-template-columns: 1fr; gap: 3rem; }
     .author-portrait { max-width: 280px; }
-}
-
-/* ===== WIKI ===== */
-.wiki-split {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4rem;
-    align-items: start;
-}
-.wiki-left { display: flex; flex-direction: column; gap: 1.5rem; }
-
-.chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    list-style: none;
-}
-.chips li {
-    font-family: var(--font-display);
-    font-size: 0.58rem;
-    font-weight: 600;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--ink-3);
-    padding: 0.42rem 0.85rem;
-    border: 1px solid var(--paper-3);
-    transition: color 0.25s ease, border-color 0.25s ease;
-}
-.chips li:hover { color: var(--red); border-color: var(--red); }
-
-.wiki-right {
-    position: sticky;
-    top: 5.5rem;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1.6rem;
-    padding: 2rem;
-    background: var(--paper-2);
-    border: 1px solid var(--paper-3);
-}
-.wiki-seal { width: 62px; height: auto; opacity: 0.85; }
-.wiki-shot { width: 100%; height: auto; border: 1px solid var(--paper-3); }
-.wiki-quote { border-left: 3px solid var(--red); padding-left: 1.2rem; }
-.wiki-quote p {
-    font-style: italic;
-    font-size: 1.02rem;
-    color: var(--ink);
-    margin-bottom: 0.5rem;
-}
-.wiki-quote cite {
-    font-family: var(--font-display);
-    font-size: 0.58rem;
-    font-style: normal;
-    font-weight: 600;
-    letter-spacing: 2.5px;
-    text-transform: uppercase;
-    color: var(--red);
-}
-
-@media (max-width: 880px) {
-    .wiki-split { grid-template-columns: 1fr; gap: 2.5rem; }
-    .wiki-right { position: static; }
+    /* O arco abraça o retrato, não a coluna inteira */
+    .arch--author { width: calc(min(280px, 100%) + 1.8rem); }
 }
 
 /* ===== FAQ ===== */
@@ -1512,7 +1610,7 @@ em { font-style: italic; }
     font-size: clamp(0.88rem, 0.84rem + 0.3vw, 1.02rem);
     font-weight: 600;
     color: var(--ink);
-    transition: color 0.25s, padding-left 0.3s var(--ease-out);
+    transition: color var(--t-move) ease, padding-left var(--t-move) var(--ease);
     -webkit-tap-highlight-color: transparent;
 }
 .faq-q::-webkit-details-marker { display: none; }
@@ -1525,7 +1623,7 @@ em { font-style: italic; }
     position: relative;
     flex-shrink: 0;
     width: 13px; height: 13px;
-    transition: transform 0.3s var(--ease-out);
+    transition: transform var(--t-move) var(--ease);
 }
 .faq-icon::before,
 .faq-icon::after {
@@ -1545,9 +1643,9 @@ em { font-style: italic; }
     block-size: 0;
     overflow: hidden;
     transition:
-        content-visibility 0.4s allow-discrete,
-        opacity 0.4s ease,
-        block-size 0.4s var(--ease-out);
+        content-visibility var(--t-move) allow-discrete,
+        opacity var(--t-move) ease,
+        block-size var(--t-move) var(--ease);
 }
 .faq-item[open]::details-content {
     opacity: 1;
@@ -1574,7 +1672,7 @@ em { font-style: italic; }
 /* ===== FOOTER ===== */
 .footer {
     background: var(--ink);
-    color: #C3BCB1;
+    color: var(--ink-body);
     padding: 4rem 0 2rem;
 }
 .footer-inner {
@@ -1588,7 +1686,7 @@ em { font-style: italic; }
     gap: 3rem;
     align-items: start;
     padding-bottom: 3rem;
-    border-bottom: 1px solid #2E2A27;
+    border-bottom: 1px solid var(--ink-line);
 }
 .footer-col--brand { display: flex; flex-direction: column; gap: 0.45rem; }
 .footer-logo {
@@ -1619,14 +1717,14 @@ em { font-style: italic; }
 }
 .footer-col--nav a {
     font-family: var(--font-display);
-    font-size: 0.68rem;
+    font-size: var(--fs-label);
     font-weight: 600;
     letter-spacing: 2px;
     text-transform: uppercase;
-    color: #C3BCB1;
+    color: var(--ink-body);
     text-decoration: none;
     padding: 0.3rem 0;
-    transition: color 0.25s ease;
+    transition: color var(--t-move) ease;
     white-space: nowrap;
 }
 .footer-col--nav a:hover { color: var(--red-lift); }
@@ -1662,7 +1760,7 @@ em { font-style: italic; }
     padding: clamp(1rem, 4vw, 3rem);
     background: rgba(20, 19, 18, 0.96);
     opacity: 0;
-    transition: opacity 0.28s ease;
+    transition: opacity var(--t-move) ease;
 }
 .lightbox[hidden] { display: none; }
 .lightbox.open { opacity: 1; }
@@ -1680,12 +1778,12 @@ em { font-style: italic; }
     max-height: calc(100svh - 9rem);
     object-fit: contain;
     transform: scale(0.98);
-    transition: transform 0.3s var(--ease-out);
+    transition: transform var(--t-move) var(--ease);
 }
 .lightbox.open .lightbox-figure img { transform: scale(1); }
 .lightbox figcaption {
     font-family: var(--font-display);
-    font-size: 0.62rem;
+    font-size: var(--fs-label-s);
     font-weight: 600;
     letter-spacing: 2.5px;
     text-transform: uppercase;
@@ -1700,12 +1798,12 @@ em { font-style: italic; }
     width: 42px; height: 42px;
     border: 1px solid var(--ink-3);
     background: none;
-    color: #C3BCB1;
+    color: var(--ink-body);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: color 0.25s, border-color 0.25s, background 0.25s;
+    transition: color var(--t-move) ease, border-color var(--t-move) ease, background var(--t-move) ease;
 }
 .lightbox-close:hover {
     color: var(--paper);
@@ -1716,21 +1814,21 @@ em { font-style: italic; }
 
 body.lightbox-open { overflow: hidden; }
 
-
 /* ============================================================
-   EFEITOS — o que dá vida ao cartaz
+   SCROLL-DRIVEN (progressivo; scrub, sempre linear)
+   Quatro usos: barra de progresso, deriva da paisagem, saída do
+   hero, respiração da pintura (+ a sangria de cor no toque).
    ============================================================ */
-
-/* Parallax de rolagem (progressivo: sem suporte, fica estático).
-   A paisagem e o arco se movem em ritmos diferentes do conteúdo. */
 @supports (animation-timeline: view()) {
     .hero-scape img {
         animation: scapeDrift linear both;
         animation-timeline: view();
         animation-range: exit 0% exit 100%;
     }
+    /* Sem scale: re-rasterizar 2200px por frame não vale um zoom
+       que ninguém percebe. */
     @keyframes scapeDrift {
-        to { transform: translateY(-14%) scale(1.06); }
+        to { transform: translateY(-10%); }
     }
     .hero-inner {
         animation: heroExit linear both;
@@ -1738,15 +1836,7 @@ body.lightbox-open { overflow: hidden; }
         animation-range: exit 10% exit 90%;
     }
     @keyframes heroExit {
-        to { opacity: 0.15; transform: translateY(-48px); }
-    }
-    .arch--hero {
-        animation: archRise linear both;
-        animation-timeline: view();
-        animation-range: exit 0% exit 100%;
-    }
-    @keyframes archRise {
-        to { transform: translateY(-9%); }
+        to { opacity: 0.3; transform: translateY(-48px); }
     }
     /* A pintura respira devagar enquanto passa pela tela */
     .artwork-shot img {
@@ -1754,91 +1844,30 @@ body.lightbox-open { overflow: hidden; }
         animation-timeline: view();
     }
     @keyframes plateDrift {
-        from { transform: scale(1.1) translateY(2%); }
-        to   { transform: scale(1.1) translateY(-2%); }
+        from { transform: scale(1.06) translateY(2%); }
+        to   { transform: scale(1.06) translateY(-2%); }
     }
 }
 
-/* Botão sólido: a tinta escura entra por baixo no hover */
-.btn-solid { position: relative; overflow: hidden; isolation: isolate; }
-.btn-solid::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: var(--red-deep);
-    transform: scaleY(0);
-    transform-origin: 50% 100%;
-    transition: transform 0.4s var(--ease-out);
-}
-.btn-solid:hover::before { transform: scaleY(1); }
-.btn-solid:hover { background: var(--red); }
-
-/* Botão de contorno: o nanquim sobe e come o botão */
-.btn-line { position: relative; overflow: hidden; isolation: isolate; }
-.btn-line::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: var(--ink);
-    transform: scaleY(0);
-    transform-origin: 50% 100%;
-    transition: transform 0.4s var(--ease-out);
-}
-.btn-line:hover::before { transform: scaleY(1); }
-
-/* A capa levanta do papel e a sombra se abre junto */
-.capa-frame .zoom img {
-    box-shadow: 0 20px 44px rgba(20, 19, 18, 0.34);
-    transition:
-        transform 0.55s var(--ease-out),
-        box-shadow 0.55s var(--ease-out);
-}
-.capa-frame .zoom:hover img {
-    transform: translateY(-10px) rotate(-0.5deg);
-    box-shadow: 0 34px 64px rgba(20, 19, 18, 0.42);
+/* No toque não há hover: a cor sangra sob controle da mão,
+   conforme a pintura atravessa a tela — e recolhe na volta. */
+@media (hover: none) {
+    @supports (animation-timeline: view()) {
+        .artwork-color {
+            transition: none;
+            animation: bleedIn linear both;
+            animation-timeline: view();
+            animation-range: contain 10% contain 90%;
+        }
+        @keyframes bleedIn {
+            from { clip-path: inset(0 100% 0 0); }
+            to   { clip-path: inset(0 0 0 0); }
+        }
+    }
 }
 
-/* Chapas: o livro cresce e a moldura escurece */
-.plate .zoom { transition: background 0.35s ease, border-color 0.35s ease, transform 0.4s var(--ease-out); }
-.plate .zoom:hover { transform: translateY(-4px); }
-
-/* Fileiras do andamento acendem ao passar o mouse */
-.step { transition: transform 0.3s var(--ease-out); }
-.step:hover { transform: translateX(4px); }
-.step:hover .step-label { color: var(--red); }
-.step-label { transition: color 0.25s ease; }
-
-/* Etiquetas da wiki */
-.chips li { transition: color 0.25s ease, border-color 0.25s ease, transform 0.3s var(--ease-out); }
-.chips li:hover { transform: translateY(-2px); }
-
-/* Redes sociais */
-.social { transition: color 0.25s, border-color 0.25s, background 0.25s, transform 0.3s var(--ease-out); }
-.social:hover { transform: translateY(-3px); }
-
-/* O ponto da novidade pulsa */
-.flash-dot {
-    animation: flashPulse 2.6s ease-out infinite;
-}
-@keyframes flashPulse {
-    0%   { box-shadow: 0 0 0 0 rgba(var(--red-rgb), 0.55); }
-    70%  { box-shadow: 0 0 0 8px rgba(var(--red-rgb), 0); }
-    100% { box-shadow: 0 0 0 0 rgba(var(--red-rgb), 0); }
-}
-.nav-link--new::before { animation: flashPulse 2.6s ease-out infinite; }
-
-/* Cabeçalhos de seção: o fio se estende sozinho */
-.sec-rule {
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 1.1s var(--ease-out) 0.2s;
-}
-.reveal.active .sec-rule,
-.no-js .sec-rule { transform: scaleX(1); }
-
-/* ===== MOVIMENTO REDUZIDO ===== */
+/* ===== MOVIMENTO REDUZIDO — o espelho do inventário =====
+   Nenhum efeito entra no CSS sem sua linha aqui. */
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     *, *::before, *::after {
@@ -1846,20 +1875,21 @@ body.lightbox-open { overflow: hidden; }
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
     }
-    .rise, .reveal { opacity: 1; transform: none; }
+    .rise, .hero-title span, .hero-stage { opacity: 1; animation: none; transform: none; }
+    .reveal, .reveal-list > * { opacity: 1; animation: none; }
     .reveal--wipe { clip-path: none; }
     .drips { clip-path: none; }
-    .arch { transform: none; }
+    .arch { transform: scaleY(1); }
     .sec-rule { transform: scaleX(1); }
-    .artwork-color { clip-path: inset(0 100% 0 0); }
-    .hero-title {
-        animation: none;
-        -webkit-text-fill-color: var(--red);
-        color: var(--red);
-    }
-    .tracker-meter i,
-    .step-bar i { width: var(--w, 0%); }
+    .hero-scape { animation: none; opacity: 1; }
+    .hero-scape img { animation: none; }
+    .hero-inner { animation: none; }
+    .js .hero-sub .char { color: var(--ink); transition: none; }
+    .stamp { animation: none; opacity: 1; transform: rotate(-1.2deg); }
+    .hero-scroll { display: none; }
+    .artwork-color { animation: none; clip-path: inset(0 100% 0 0); }
+    .artwork-shot img { animation: none; }
+    .tracker-meter i, .step-bar i { transform: scaleX(var(--w-n, 0)); }
     .scroll-progress { display: none; }
-    .marquee-track { animation: none; }
     .lightbox-figure img { transform: none; }
 }

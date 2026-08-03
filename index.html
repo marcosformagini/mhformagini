@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>M. H. Formagini — Autor de Fantasia</title>
-    <meta name="description" content="M. H. Formagini — autor de Fantasia Épica e Alta Fantasia. Criador do universo de Erráwyn e das Crônicas Méssias. A capa da Edição Definitiva de Sombras da Guerra já foi revelada.">
+    <meta name="description" content="M. H. Formagini — autor de Fantasia Épica e Alta Fantasia. Sombras da Guerra, Volume I das Crônicas Méssias, ganha sua Edição Definitiva. Leia a sinopse e veja a capa revelada.">
     <link rel="canonical" href="https://mhformagini.com.br/">
     <meta name="theme-color" content="#DED7CA">
     <meta property="og:title" content="M. H. Formagini | Autor de Fantasia">
@@ -28,14 +28,30 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "Person",
-      "name": "M. H. Formagini",
-      "url": "https://mhformagini.com.br/",
-      "jobTitle": "Autor de Fantasia Épica",
-      "sameAs": [
-        "https://www.instagram.com/mhformagini",
-        "https://www.tiktok.com/@mhformagini",
-        "https://www.threads.com/@mhformagini"
+      "@graph": [
+        {
+          "@type": "Person",
+          "@id": "https://mhformagini.com.br/#autor",
+          "name": "M. H. Formagini",
+          "url": "https://mhformagini.com.br/",
+          "jobTitle": "Autor de Fantasia Épica",
+          "sameAs": [
+            "https://www.instagram.com/mhformagini",
+            "https://www.tiktok.com/@mhformagini",
+            "https://www.threads.com/@mhformagini"
+          ]
+        },
+        {
+          "@type": "Book",
+          "name": "Sombras da Guerra",
+          "alternateName": "Sombras da Guerra — Sangue do Império",
+          "position": "1",
+          "isPartOf": { "@type": "BookSeries", "name": "Crônicas Méssias" },
+          "author": { "@id": "https://mhformagini.com.br/#autor" },
+          "inLanguage": "pt-BR",
+          "image": "https://mhformagini.com.br/assets/img/capa/sdg-capa-1200.webp",
+          "description": "A lenda prometia ao Imperador Magno Bravo uma morte de guerreiro. O destino resolveu puni-lo com um humor sombrio. Distante da capital, Sally, uma aprendiz de espiã, atravessa terras devastadas rumo a Sangueforte, carregando segredos que podem salvar o império ou destruí-lo de vez."
+        }
       ]
     }
     </script>
@@ -45,9 +61,9 @@
 <!-- Grão de papel e envelhecimento, por cima de tudo -->
 <div class="grain" aria-hidden="true"></div>
 
-<!-- Os dois conjuntos de fios, definidos uma vez e reaproveitados com <use>.
-     Cada faixa de opacidade é um path só — é a variação de tom que
-     impede o conjunto de virar uma trama regular. -->
+<!-- Fios de cota, definidos uma vez e reaproveitados com <use>.
+     Cada faixa de opacidade é um path só — a variação de tom
+     impede o conjunto de virar trama regular. -->
 <svg class="drip-defs" width="0" height="0" aria-hidden="true" focusable="false">
     <defs>
         <g id="drips-a" stroke="currentColor" stroke-width="1" fill="none">
@@ -74,11 +90,11 @@
     <div class="topbar-inner">
         <a class="nav-brand" href="#home" aria-label="Início">M.&#8202;H.&#8202;Formagini</a>
         <ul class="nav-links" id="navLinks" role="list">
-            <li><a href="#home"       class="nav-link active">Início</a></li>
+            <li><a href="#historia"   class="nav-link">História</a></li>
             <li><a href="#capa"       class="nav-link nav-link--new">A Capa</a></li>
-            <li><a href="#lancamento" class="nav-link">Lançamento</a></li>
+            <li><a href="#lancamento" class="nav-link">Edição</a></li>
+            <li><a href="#errawyn"    class="nav-link">Erráwyn</a></li>
             <li><a href="#autor"      class="nav-link">Autor</a></li>
-            <li><a href="#wiki"       class="nav-link">Wiki</a></li>
             <li><a href="#faq"        class="nav-link">FAQ</a></li>
         </ul>
         <button class="nav-toggle" id="navToggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="navLinks">
@@ -87,18 +103,19 @@
     </div>
 </nav>
 
-<!-- ===== HERO ===== -->
+<!-- ===== HERO — a promessa =====
+     Cena dirigida única: arco e paisagem armam o palco, o título
+     empilha linha a linha, o subtítulo seca da esquerda para a
+     direita, o livro entra, o selo carimba. Depois, silêncio. -->
 <section id="home" class="hero">
-    <canvas id="dust-canvas" aria-hidden="true"></canvas>
     <span class="tick tick--tl" aria-hidden="true"></span>
     <span class="tick tick--tr" aria-hidden="true"></span>
-    <svg class="drips drips--left" viewBox="0 0 200 300" preserveAspectRatio="none" aria-hidden="true"><use href="#drips-a"/></svg>
-    <svg class="drips drips--right" viewBox="0 0 120 300" preserveAspectRatio="none" aria-hidden="true"><use href="#drips-b"/></svg>
 
-    <!-- O arco desce até o fim da section, como uma coluna -->
+    <!-- Coluna de sangue: nasce no alto e termina onde a section termina -->
     <span class="arch arch--hero" aria-hidden="true"></span>
 
-    <!-- A muralha sobe do papel: arte com o céu recortado, dissolvendo pra cima -->
+    <!-- A muralha sobe do papel: o céu da pintura é transparente,
+         o papel do site é o céu -->
     <div class="hero-scape" aria-hidden="true">
         <img src="assets/img/capa/arte-recorte-1400.webp"
              srcset="assets/img/capa/arte-recorte-1400.webp 1400w, assets/img/capa/arte-recorte-2200.webp 2200w"
@@ -108,34 +125,24 @@
 
     <div class="hero-inner">
         <div class="hero-text">
-            <a class="flash rise" href="#capa">
-                <span class="flash-dot" aria-hidden="true"></span>
-                Capa revelada
-                <span class="flash-arrow" aria-hidden="true">→</span>
-            </a>
-            <span class="eyebrow rise">Crônicas Méssias · Volume I</span>
-            <h1 class="hero-title rise">
-                <span>Sombras</span>
-                <span>da</span>
-                <span>Guerra</span>
+            <span class="eyebrow rise" style="--dl:.2s">Crônicas Méssias · Volume I</span>
+            <h1 class="hero-title">
+                <span style="--dl:.38s">Sombras</span>
+                <span style="--dl:.47s">da</span>
+                <span style="--dl:.56s">Guerra</span>
             </h1>
-            <p class="hero-sub rise" id="hero-saga">Sangue do Império</p>
-            <p class="hero-desc rise">
-                Uma nova edição. Uma nova era.<br>
-                <em>100% independente.</em>
-            </p>
-            <p class="hero-attr rise">
+            <p class="hero-sub" id="hero-saga">Sangue do Império</p>
+            <p class="hero-attr rise" style="--dl:.8s">
                 <span class="hero-attr-rule" aria-hidden="true"></span>
                 M. H. Formagini
             </p>
-            <div class="hero-actions rise">
-                <a href="#capa" class="btn-solid">Ver a capa</a>
-                <a href="#lancamento" class="btn-line">Saiba mais</a>
-                <a href="#wiki" class="btn-link">Explorar Erráwyn</a>
+            <div class="hero-actions rise" style="--dl:.92s">
+                <a href="#historia" class="btn-solid">Ler a história</a>
+                <a href="#capa" class="btn-line">Ver a capa</a>
             </div>
         </div>
 
-        <div class="hero-stage rise" aria-hidden="true">
+        <div class="hero-stage rise rise--book" style="--dl:.5s">
             <div class="hero-book" id="heroBook">
                 <img src="assets/img/capa/sdg-mock-aberto-700.webp"
                      srcset="assets/img/capa/sdg-mock-aberto-700.webp 700w, assets/img/capa/sdg-mock-aberto-1400.webp 1400w"
@@ -144,55 +151,90 @@
                      alt="Capa aberta da Edição Definitiva de Sombras da Guerra"
                      class="hero-book-img" fetchpriority="high" decoding="async">
             </div>
-            <span class="stamp">
-                <span class="stamp-check">
+            <a class="stamp" href="#capa">
+                <span class="stamp-check" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
                 </span>
                 <span class="stamp-text">
                     <b>Capa revelada</b>
                     <i>Edição Definitiva</i>
                 </span>
-            </span>
+            </a>
         </div>
     </div>
 
-    <div class="hero-scroll" aria-hidden="true"><span></span></div>
+    <div class="hero-scroll" id="heroScroll" aria-hidden="true"><span></span></div>
 </section>
 
-<!-- ===== MARQUEE ===== -->
-<div class="marquee" aria-hidden="true">
-    <div class="marquee-track">
-        <div class="marquee-group">
-            <span>Sombras da Guerra</span><span class="marquee-sep">/</span>
-            <span>Edição Definitiva</span><span class="marquee-sep">/</span>
-            <span>Em breve</span><span class="marquee-sep">/</span>
-            <span>Crônicas Méssias</span><span class="marquee-sep">/</span>
-            <span>Erráwyn</span><span class="marquee-sep">/</span>
-            <span>100% Independente</span><span class="marquee-sep">/</span>
-        </div>
-        <div class="marquee-group">
-            <span>Sombras da Guerra</span><span class="marquee-sep">/</span>
-            <span>Edição Definitiva</span><span class="marquee-sep">/</span>
-            <span>Em breve</span><span class="marquee-sep">/</span>
-            <span>Crônicas Méssias</span><span class="marquee-sep">/</span>
-            <span>Erráwyn</span><span class="marquee-sep">/</span>
-            <span>100% Independente</span><span class="marquee-sep">/</span>
+<!-- ===== A HISTÓRIA — o motivo de se importar =====
+     A quarta capa, transcrita por inteiro. O impacto é tipográfico:
+     nenhum efeito novo, nenhuma imagem. -->
+<section id="historia" class="section section--ink">
+    <svg class="drips drips--right" viewBox="0 0 120 300" preserveAspectRatio="none" aria-hidden="true"><use href="#drips-b"/></svg>
+    <div class="section-inner">
+        <header class="sec-head reveal">
+            <div class="sec-meta">
+                <span class="eyebrow">Quarta capa · Livro I</span>
+                <span class="sec-rule" aria-hidden="true"></span>
+            </div>
+            <h2 class="sec-title">
+                <span>A</span>
+                <span><em>história</em></span>
+            </h2>
+        </header>
+
+        <div class="story">
+            <p class="story-open reveal">
+                A lenda prometia ao Imperador Magno Bravo uma morte de guerreiro,
+                em campo aberto, como muitos do seu sangue.
+            </p>
+
+            <div class="story-body reveal" style="--dl:.12s">
+                <p>
+                    O destino, porém, resolveu puni-lo com um humor sombrio: ele sangra
+                    devagar em Sangueforte, mutilado por inimigos invisíveis que sussurram
+                    veneno e escrevem maldições.
+                </p>
+                <p>
+                    Distante da capital, Sally, uma aprendiz de espiã marcada por um passado
+                    cruel, atravessa terras devastadas rumo a Sangueforte, carregando segredos
+                    que podem salvar o império ou destruí-lo de vez. Mas cada légua do caminho
+                    a obriga a ver o que os bardos não cantam: a crua realidade da guerra, onde
+                    a maldade humana vem à tona e nobres e plebeus apodrecem juntos na mesma lama.
+                </p>
+                <p>
+                    Do trono ao campo de batalha, cada um trava a sua própria guerra. O general
+                    que defende uma cidade condenada. O jovem que sente o terrível peso de uma
+                    herança de sangue. O soldado que aprende que sobreviver também é uma escolha.
+                    Reis e nobres movem suas peças no tabuleiro, sacrificando peões sem rosto em
+                    nome da honra e do legado, sem perceber que a guerra deixou de obedecer a
+                    quem a começou.
+                </p>
+            </div>
+
+            <!-- O ornamento impresso na própria quarta capa: traço, losango, traço -->
+            <div class="story-mark reveal" aria-hidden="true">
+                <span></span><i></i><span></span>
+            </div>
+
+            <p class="story-final reveal">E, no rastro dos exércitos, algo desperta.</p>
+            <p class="story-climax reveal" style="--dl:.15s">Os corvos não são os únicos com&nbsp;fome.</p>
+
+            <div class="story-actions reveal">
+                <a href="#capa" class="btn-line btn-line--paper">Ver a edição</a>
+            </div>
         </div>
     </div>
-</div>
+</section>
 
-<!-- ===== A CAPA ===== -->
+<!-- ===== A CAPA — o objeto ===== -->
 <section id="capa" class="section section--paper">
     <svg class="drips drips--right" viewBox="0 0 120 300" preserveAspectRatio="none" aria-hidden="true"><use href="#drips-b"/></svg>
     <div class="section-inner">
         <header class="sec-head reveal">
             <div class="sec-meta">
-                <span class="eyebrow">Marco concluído</span>
+                <span class="eyebrow">Edição Definitiva</span>
                 <span class="sec-rule" aria-hidden="true"></span>
-                <span class="tally">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
-                    3 de 6 etapas
-                </span>
             </div>
             <h2 class="sec-title">
                 <span>Revelação</span>
@@ -202,6 +244,7 @@
 
         <div class="capa-body">
         <span class="arch arch--capa" aria-hidden="true"></span>
+
         <div class="capa-reveal">
             <figure class="capa-frame reveal">
                 <button type="button" class="zoom"
@@ -222,32 +265,29 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
                     Concluída
                 </span>
-                <figcaption>Sombras da Guerra · Livro I</figcaption>
+                <figcaption>
+                    <span>Sombras da Guerra · Livro I</span>
+                    <span class="credits-line">Arte — Tiago Sousa &nbsp;·&nbsp; Capa — Bia Cunha</span>
+                </figcaption>
             </figure>
 
             <div class="capa-side">
                 <p class="text-lead reveal">
                     Depois de meses entre esboços, testes de tipografia e ajustes de luz, a capa da
-                    <strong>Edição Definitiva</strong> está finalizada. É o primeiro pedaço da nova edição
-                    que sai do escuro — e vale a pena comemorar.
+                    <strong>Edição Definitiva</strong> está finalizada. É o primeiro pedaço da nova
+                    edição que sai do escuro — e vale a pena comemorar.
                 </p>
-
-                <dl class="credits reveal" style="--d:.04s">
-                    <div><dt>Arte</dt><dd>Tiago Sousa</dd></div>
-                    <div><dt>Capa</dt><dd>Bia Cunha</dd></div>
-                </dl>
-
-                <blockquote class="pull reveal" style="--d:.3s">
-                    <p>E, no rastro dos exércitos, algo desperta. Os corvos não são os únicos com fome.</p>
-                    <cite>Quarta capa · Sombras da Guerra</cite>
-                </blockquote>
+                <p class="text-body reveal" style="--dl:.1s">
+                    A pintura é de Tiago Sousa; o projeto gráfico, de Bia Cunha. O portão de
+                    Bravorte, os estandartes escarlates e o céu de cinzas saíram direto das
+                    páginas do livro para a capa.
+                </p>
             </div>
         </div>
 
-        <div class="sec-meta sec-meta--mid reveal">
-            <span class="eyebrow">A arte</span>
+        <div class="sub-head reveal">
+            <h3>A arte de Tiago Sousa</h3>
             <span class="sec-rule" aria-hidden="true"></span>
-            <span class="credit-inline">Tiago Sousa</span>
         </div>
 
         <figure class="artwork reveal">
@@ -271,18 +311,19 @@
                 <span class="sr-only">Ver a pintura original completa, em cor</span>
             </button>
             <figcaption>
-                Um trecho. A muralha inteira vai bem além do que coube na capa — o que
-                virou o livro é só o portão. Passe o mouse para a cor voltar; clique para ver tudo.
+                Um trecho. A muralha inteira vai bem além do que coube na capa — o que virou
+                o livro é só o portão. Passe o mouse — ou role — para a cor voltar; clique
+                para ver tudo.
             </figcaption>
         </figure>
 
-        <div class="sec-meta sec-meta--mid reveal">
-            <span class="eyebrow">A edição por inteiro</span>
+        <div class="sub-head reveal">
+            <h3>A edição por inteiro</h3>
             <span class="sec-rule" aria-hidden="true"></span>
         </div>
 
-        <ul class="plates" role="list">
-            <li class="plate reveal" style="--d:.06s">
+        <ul class="plates reveal-list" role="list">
+            <li class="plate" style="--n:0">
                 <button type="button" class="zoom"
                         data-lightbox="assets/img/capa/sdg-mock-capa-dura-1100.webp"
                         data-caption="Capa dura — Edição Definitiva">
@@ -294,7 +335,7 @@
                 </button>
                 <span class="plate-cap">Capa dura</span>
             </li>
-            <li class="plate reveal" style="--d:.12s">
+            <li class="plate" style="--n:1">
                 <button type="button" class="zoom"
                         data-lightbox="assets/img/capa/sdg-mock-aberto-1100.webp"
                         data-caption="Capa e quarta capa abertas">
@@ -306,7 +347,7 @@
                 </button>
                 <span class="plate-cap">Capa aberta</span>
             </li>
-            <li class="plate reveal" style="--d:.18s">
+            <li class="plate" style="--n:2">
                 <button type="button" class="zoom"
                         data-lightbox="assets/img/capa/sdg-mock-duo-1100.webp"
                         data-caption="Impresso e e-book">
@@ -318,7 +359,7 @@
                 </button>
                 <span class="plate-cap">Impresso &amp; e-book</span>
             </li>
-            <li class="plate reveal" style="--d:.24s">
+            <li class="plate" style="--n:3">
                 <button type="button" class="zoom"
                         data-lightbox="assets/img/capa/sdg-4acapa-800.webp"
                         data-caption="Quarta capa — a sinopse da Edição Definitiva">
@@ -328,7 +369,7 @@
                          width="480" height="720" loading="lazy" decoding="async"
                          alt="Quarta capa com a sinopse de Sombras da Guerra">
                 </button>
-                <span class="plate-cap">Quarta capa</span>
+                <span class="plate-cap"><a href="#historia">Quarta capa · ler a sinopse</a></span>
             </li>
         </ul>
 
@@ -343,41 +384,40 @@
     </div>
 </section>
 
-<!-- ===== LANÇAMENTO ===== -->
+<!-- ===== A EDIÇÃO — diário de produção ===== -->
 <section id="lancamento" class="section section--paper-2">
     <svg class="drips drips--left drips--low" viewBox="0 0 200 300" preserveAspectRatio="none" aria-hidden="true"><use href="#drips-a"/></svg>
     <div class="section-inner">
-        <header class="sec-head reveal">
+        <header class="sec-head sec-head--row reveal">
             <div class="sec-meta">
-                <span class="eyebrow">Edição Definitiva</span>
+                <span class="eyebrow">Diário de produção</span>
                 <span class="sec-rule" aria-hidden="true"></span>
             </div>
-            <h2 class="sec-title">
-                <span>Um novo</span>
-                <span><em>capítulo</em> começa</span>
-            </h2>
+            <h2 class="sec-title sec-title--s">A <em>Edição Definitiva</em></h2>
         </header>
 
         <div class="launch-layout">
             <div class="launch-left">
                 <p class="text-lead reveal">
-                    A parceria com a editora chegou ao fim. Agora sigo como autor <b>100% independente</b>.
+                    A parceria com a editora chegou ao fim. Agora sigo como autor
+                    <b>100% independente</b> — e a nova edição está sendo feita do zero,
+                    peça por peça.
                 </p>
 
-                <ul class="notes" role="list">
-                    <li class="note reveal" style="--d:.06s">
+                <ul class="notes reveal-list" role="list">
+                    <li class="note" style="--n:0">
                         <h3>Livro fora do ar</h3>
                         <p>A edição anterior foi descontinuada. A nova versão está a caminho.</p>
                     </li>
-                    <li class="note reveal" style="--d:.12s">
+                    <li class="note" style="--n:1">
                         <h3>Edição Definitiva</h3>
                         <p>Nova capa, nova diagramação e um texto ainda mais refinado.</p>
                     </li>
-                    <li class="note reveal" style="--d:.18s">
+                    <li class="note" style="--n:2">
                         <h3>Conteúdo inédito</h3>
                         <p>Capítulos adicionais que aprofundam a saga.</p>
                     </li>
-                    <li class="note reveal" style="--d:.24s">
+                    <li class="note" style="--n:3">
                         <h3>Brindes exclusivos</h3>
                         <p>Materiais especiais para quem garantir a edição nos primeiros dias.</p>
                     </li>
@@ -385,59 +425,59 @@
             </div>
 
             <div class="launch-right">
-                <div class="tracker reveal" style="--d:.12s">
+                <div class="tracker reveal">
                     <h3 class="tracker-title">Andamento</h3>
                     <div class="tracker-summary">
                         <span class="tracker-count"><b>3</b> de 6 etapas concluídas</span>
-                        <span class="tracker-meter" aria-hidden="true"><i style="--w:50%"></i></span>
+                        <span class="tracker-meter" aria-hidden="true"><i style="--w-n:.5"></i></span>
                     </div>
                     <ol class="steps" role="list">
-                        <li class="step step--done">
+                        <li class="step step--done" style="--n:0">
                             <span class="step-mark" aria-hidden="true"></span>
                             <span class="step-label">Ajustes da segunda edição</span>
                             <span class="step-state">Concluído</span>
-                            <span class="step-bar" aria-hidden="true"><i style="--w:100%"></i></span>
+                            <span class="step-bar" aria-hidden="true"><i style="--w-n:1"></i></span>
                         </li>
-                        <li class="step step--done">
+                        <li class="step step--done" style="--n:1">
                             <span class="step-mark" aria-hidden="true"></span>
                             <span class="step-label">Leitura Crítica</span>
                             <span class="step-state">Concluída</span>
-                            <span class="step-bar" aria-hidden="true"><i style="--w:100%"></i></span>
+                            <span class="step-bar" aria-hidden="true"><i style="--w-n:1"></i></span>
                         </li>
-                        <li class="step step--done step--fresh">
+                        <li class="step step--done" style="--n:2">
                             <span class="step-mark" aria-hidden="true"></span>
                             <span class="step-label"><a href="#capa">Capa <span aria-hidden="true">↗</span></a></span>
                             <span class="step-state">Concluída</span>
-                            <span class="step-bar" aria-hidden="true"><i style="--w:100%"></i></span>
+                            <span class="step-bar" aria-hidden="true"><i style="--w-n:1"></i></span>
                         </li>
-                        <li class="step step--doing">
+                        <li class="step step--doing" style="--n:3">
                             <span class="step-mark" aria-hidden="true"></span>
                             <span class="step-label">Revisão</span>
                             <span class="step-state">Em andamento</span>
-                            <span class="step-bar" aria-hidden="true"><i style="--w:30%"></i></span>
+                            <span class="step-bar" aria-hidden="true"><i style="--w-n:.3"></i></span>
                         </li>
-                        <li class="step step--todo">
+                        <li class="step step--todo" style="--n:4">
                             <span class="step-mark" aria-hidden="true"></span>
                             <span class="step-label">Diagramação</span>
                             <span class="step-state">Pendente</span>
-                            <span class="step-bar" aria-hidden="true"><i style="--w:0%"></i></span>
+                            <span class="step-bar" aria-hidden="true"><i style="--w-n:0"></i></span>
                         </li>
-                        <li class="step step--todo">
+                        <li class="step step--todo" style="--n:5">
                             <span class="step-mark" aria-hidden="true"></span>
                             <span class="step-label">Revisão de prova</span>
                             <span class="step-state">Pendente</span>
-                            <span class="step-bar" aria-hidden="true"><i style="--w:0%"></i></span>
+                            <span class="step-bar" aria-hidden="true"><i style="--w-n:0"></i></span>
                         </li>
-                        <li class="step step--goal">
+                        <li class="step step--goal" style="--n:6">
                             <span class="step-mark" aria-hidden="true"></span>
                             <span class="step-label">Pré-venda</span>
                             <span class="step-state">Meta</span>
-                            <span class="step-bar" aria-hidden="true"><i style="--w:0%"></i></span>
+                            <span class="step-bar" aria-hidden="true"><i style="--w-n:0"></i></span>
                         </li>
                     </ol>
                 </div>
 
-                <p class="after-note reveal" style="--d:.24s">
+                <p class="after-note reveal" style="--dl:.15s">
                     <b>E depois?</b>
                     Com a pré-venda encerrada, começa a jornada da publicação oficial.
                 </p>
@@ -446,7 +486,82 @@
     </div>
 </section>
 
-<!-- ===== AUTOR ===== -->
+<!-- ===== ERRÁWYN — o mundo ===== -->
+<section id="errawyn" class="section section--paper">
+    <svg class="drips drips--left drips--low" viewBox="0 0 120 300" preserveAspectRatio="none" aria-hidden="true"><use href="#drips-b"/></svg>
+    <div class="section-inner">
+        <header class="sec-head reveal">
+            <div class="sec-meta">
+                <span class="eyebrow">O mundo</span>
+                <span class="sec-rule" aria-hidden="true"></span>
+            </div>
+            <h2 class="sec-title sec-title--m">
+                <span>Erráwyn</span>
+            </h2>
+        </header>
+
+        <!-- A prancha de arquivo: o mapa impresso no papel do site -->
+        <figure class="map-plate reveal">
+            <span class="tick tick--tl" aria-hidden="true"></span>
+            <span class="tick tick--tr" aria-hidden="true"></span>
+            <span class="tick tick--bl" aria-hidden="true"></span>
+            <span class="tick tick--br" aria-hidden="true"></span>
+            <button type="button" class="zoom"
+                    data-lightbox="assets/img/maps/errawyn-2000.webp"
+                    data-caption="Mapa de Erráwyn · 890–891 D.E. — Arquivo da Ordem de Monte Carvalho">
+                <img src="assets/img/maps/errawyn-1200.webp"
+                     srcset="assets/img/maps/errawyn-1200.webp 1200w, assets/img/maps/errawyn-2000.webp 2000w"
+                     sizes="(max-width: 880px) 92vw, 1150px"
+                     width="1200" height="1170" loading="lazy" decoding="async"
+                     alt="Mapa do continente de Erráwyn, com o Império Méssio a leste, os reinos do oeste e os quatro grandes mares">
+                <span class="zoom-hint" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5M11 8v6M8 11h6"/></svg>
+                    Ampliar
+                </span>
+                <span class="sr-only">Ampliar o mapa de Erráwyn</span>
+            </button>
+            <figcaption>Erráwyn · 890–891 D.E. — Arquivo da Ordem de Monte Carvalho · toque ou clique para ampliar</figcaption>
+        </figure>
+
+        <div class="wiki-split">
+            <div class="wiki-left">
+                <p class="text-body reveal">
+                    Todo o universo de <em>Sombras da Guerra</em> está catalogado numa wiki
+                    organizada como o próprio arquivo da <strong>Ordem de Monte Carvalho</strong> —
+                    instituição milenar dedicada ao conhecimento e à preservação da memória do
+                    Império Méssio: sua história, a hierarquia, os Grandes Mestres, títulos e cargos.
+                </p>
+
+                <ul class="chips reveal-list" role="list">
+                    <li style="--n:0">História</li>
+                    <li style="--n:1">Cronologia</li>
+                    <li style="--n:2">Casas Imperiais</li>
+                    <li style="--n:3">Religião</li>
+                    <li style="--n:4">Política</li>
+                    <li style="--n:5">Regiões</li>
+                    <li style="--n:6">Cultura</li>
+                    <li style="--n:7">Povos</li>
+                </ul>
+
+                <a href="https://odmcwiki.mhformagini.com.br/" target="_blank" rel="noopener"
+                   class="btn-solid" aria-label="Acessar a Wiki da Ordem de Monte Carvalho">
+                    Explorar a Wiki
+                </a>
+            </div>
+
+            <div class="wiki-right reveal" style="--dl:.12s">
+                <img src="assets/img/odmc-branco-200.webp" alt=""
+                     width="200" height="200" loading="lazy" decoding="async" class="wiki-seal">
+                <blockquote class="pull">
+                    <p>O saber é a raiz que sustenta impérios.</p>
+                    <cite>Ordem de Monte Carvalho</cite>
+                </blockquote>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== O AUTOR ===== -->
 <section id="autor" class="section section--ink">
     <svg class="drips drips--right drips--tall" viewBox="0 0 120 300" preserveAspectRatio="none" aria-hidden="true"><use href="#drips-b"/></svg>
     <div class="section-inner">
@@ -457,7 +572,7 @@
                     <img src="assets/img/perfil-480.webp" alt="M. H. Formagini"
                          width="480" height="477" loading="lazy" decoding="async" class="author-photo">
                 </figure>
-                <div class="socials reveal" style="--d:.18s">
+                <div class="socials">
                     <a href="https://www.instagram.com/mhformagini" target="_blank" rel="noopener" class="social" aria-label="Instagram">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
                     </a>
@@ -476,87 +591,28 @@
                         <span class="eyebrow">O escritor</span>
                         <span class="sec-rule" aria-hidden="true"></span>
                     </div>
-                    <h2 class="sec-title">
+                    <h2 class="sec-title sec-title--m">
                         <span>M. H.</span>
                         <span>Formagini</span>
                     </h2>
                 </header>
-                <p class="text-body has-dropcap reveal" style="--d:.06s">
-                    Desenvolvedor de Sistemas de Informação por profissão, mas escritor por vocação. Sua verdadeira paixão está além do código — na criação de mundos onde impérios se erguem e caem.
-                </p>
-                <p class="text-body reveal" style="--d:.12s">
-                    No coração de sua obra está <strong>Erráwyn</strong>, habitado por impérios, guerras e personagens moldados pela luta e pelo destino. As <strong>Crônicas Méssias</strong> são o fio condutor — épicas, sombrias e profundamente humanas.
-                </p>
-                <blockquote class="pull reveal" style="--d:.18s">
+                <div class="reveal" style="--dl:.08s">
+                    <p class="text-body has-dropcap">
+                        Desenvolvedor de Sistemas de Informação por profissão, mas escritor por
+                        vocação. Sua verdadeira paixão está além do código — na criação de mundos
+                        onde impérios se erguem e caem.
+                    </p>
+                    <p class="text-body">
+                        No coração de sua obra está <strong>Erráwyn</strong>, habitado por impérios,
+                        guerras e personagens moldados pela luta e pelo destino. As
+                        <strong>Crônicas Méssias</strong> são o fio condutor — épicas, sombrias e
+                        profundamente humanas.
+                    </p>
+                </div>
+                <blockquote class="pull pull--lg reveal" style="--dl:.16s">
                     <p>As páginas são pequenas demais para conter o universo que eu criei; os livros são apenas servos da sua imensidão.</p>
                     <cite>M. H. Formagini</cite>
                 </blockquote>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ===== WIKI ===== -->
-<section id="wiki" class="section section--paper">
-    <svg class="drips drips--left drips--low" viewBox="0 0 120 300" preserveAspectRatio="none" aria-hidden="true"><use href="#drips-b"/></svg>
-    <div class="section-inner">
-        <header class="sec-head reveal">
-            <div class="sec-meta">
-                <span class="eyebrow">O compêndio</span>
-                <span class="sec-rule" aria-hidden="true"></span>
-            </div>
-            <h2 class="sec-title">
-                <span>A wiki de</span>
-                <span><em>Erráwyn</em></span>
-            </h2>
-        </header>
-
-        <div class="wiki-split">
-            <div class="wiki-left">
-                <p class="text-body reveal">
-                    Esta wiki é o acervo completo do universo de <em>Sombras da Guerra</em>, organizado como se fosse o próprio arquivo da Ordem de Monte Carvalho — uma instituição milenar dedicada ao conhecimento e à preservação da memória do Império Méssio.
-                </p>
-
-                <ul class="chips reveal" style="--d:.06s" role="list">
-                    <li>História</li>
-                    <li>Cronologia</li>
-                    <li>Casas Imperiais</li>
-                    <li>Religião</li>
-                    <li>Política</li>
-                    <li>Regiões</li>
-                    <li>Cultura</li>
-                    <li>Povos</li>
-                </ul>
-
-                <ul class="notes" role="list">
-                    <li class="note reveal" style="--d:.12s">
-                        <h3>A Ordem</h3>
-                        <p>História da ordem, hierarquia interna, os Grandes Mestres de destaque, títulos, cargos e muito mais.</p>
-                    </li>
-                    <li class="note reveal" style="--d:.18s">
-                        <h3>O Acervo</h3>
-                        <p>Tudo sobre os méssio, suas ordens e instituições, casas imperiais, cronologia, religião, política, regiões e cultura. Além de estudos e detalhes sobre outros povos.</p>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="wiki-right reveal" style="--d:.12s">
-                <img src="assets/img/odmc-branco-200.webp" alt=""
-                     width="200" height="200" loading="lazy" decoding="async" class="wiki-seal">
-
-                <img src="assets/img/aordem-900.webp" alt="Introdução da Ordem de Monte Carvalho"
-                     width="900" height="442" loading="lazy" decoding="async" class="wiki-shot">
-
-                <blockquote class="wiki-quote">
-                    <p>O saber é a raiz que sustenta impérios.</p>
-                    <cite>Ordem de Monte Carvalho</cite>
-                </blockquote>
-
-                <a href="https://odmcwiki.mhformagini.com.br/" target="_blank" rel="noopener"
-                   class="btn-solid btn-solid--wide"
-                   aria-label="Acessar a Wiki da Ordem de Monte Carvalho">
-                    Explorar a Wiki
-                </a>
             </div>
         </div>
     </div>
@@ -566,37 +622,25 @@
 <section id="faq" class="section section--paper-2">
     <svg class="drips drips--right" viewBox="0 0 200 300" preserveAspectRatio="none" aria-hidden="true"><use href="#drips-a"/></svg>
     <div class="section-inner">
-        <header class="sec-head reveal">
+        <header class="sec-head sec-head--row reveal">
             <div class="sec-meta">
                 <span class="eyebrow">Dúvidas</span>
                 <span class="sec-rule" aria-hidden="true"></span>
             </div>
-            <h2 class="sec-title">
-                <span>Perguntas</span>
-                <span><em>frequentes</em></span>
-            </h2>
+            <h2 class="sec-title sec-title--s">Perguntas <em>frequentes</em></h2>
         </header>
 
-        <div class="faq-list">
-            <details class="faq-item reveal" name="faq">
+        <div class="faq-list reveal-list">
+            <details class="faq-item" name="faq" style="--n:0">
                 <summary class="faq-q">
                     <span class="faq-q-text">Onde posso comprar o livro Sombras da Guerra?</span>
                     <span class="faq-icon" aria-hidden="true"></span>
                 </summary>
                 <div class="faq-a">
-                    <p>No momento o livro está fora do ar. A edição anterior foi descontinuada com o fim da parceria com a editora Palavra &amp; Verso. A Edição Definitiva está sendo produzida e será anunciada em breve nas redes sociais.</p>
+                    <p>No momento, o livro está fora do ar. A edição anterior foi descontinuada com o fim da parceria com a editora Palavra &amp; Verso. A Edição Definitiva está em produção — a capa já foi revelada, veja em <a href="#capa">A Capa</a> — e a pré-venda será anunciada nas redes sociais.</p>
                 </div>
             </details>
-            <details class="faq-item reveal" name="faq" style="--d:.06s">
-                <summary class="faq-q">
-                    <span class="faq-q-text">A capa nova já está pronta?</span>
-                    <span class="faq-icon" aria-hidden="true"></span>
-                </summary>
-                <div class="faq-a">
-                    <p>Está — e já foi revelada. Dá para ver a capa, a quarta capa e os mockups da edição na seção <a href="#capa">A Capa</a>. Com essa etapa fechada, a produção segue agora para a revisão do texto.</p>
-                </div>
-            </details>
-            <details class="faq-item reveal" name="faq" style="--d:.12s">
+            <details class="faq-item" name="faq" style="--n:1">
                 <summary class="faq-q">
                     <span class="faq-q-text">O que muda na Edição Definitiva?</span>
                     <span class="faq-icon" aria-hidden="true"></span>
@@ -605,7 +649,7 @@
                     <p>Nova capa, nova diagramação, texto revisado e mais fluido, além de capítulos inéditos que aprofundam o início da saga. Uma produção editorial 100% independente.</p>
                 </div>
             </details>
-            <details class="faq-item reveal" name="faq" style="--d:.18s">
+            <details class="faq-item" name="faq" style="--n:2">
                 <summary class="faq-q">
                     <span class="faq-q-text">Preciso ler a primeira edição antes?</span>
                     <span class="faq-icon" aria-hidden="true"></span>
@@ -614,7 +658,7 @@
                     <p>Não. A Edição Definitiva é a versão completa e aprimorada. Quem já leu está pronto para o Volume 2, mas novos leitores podem começar diretamente por ela.</p>
                 </div>
             </details>
-            <details class="faq-item reveal" name="faq" style="--d:.24s">
+            <details class="faq-item" name="faq" style="--n:3">
                 <summary class="faq-q">
                     <span class="faq-q-text">O que é Erráwyn?</span>
                     <span class="faq-icon" aria-hidden="true"></span>
@@ -623,7 +667,7 @@
                     <p>Erráwyn é o mundo fictício onde se passam todas as histórias das Crônicas Méssias — um universo de fantasia épica com impérios, guerras, política e forças além da compreensão mortal.</p>
                 </div>
             </details>
-            <details class="faq-item reveal" name="faq" style="--d:.3s">
+            <details class="faq-item" name="faq" style="--n:4">
                 <summary class="faq-q">
                     <span class="faq-q-text">Quantos livros terá a saga?</span>
                     <span class="faq-icon" aria-hidden="true"></span>
@@ -632,7 +676,7 @@
                     <p>Sombras da Guerra é o Volume I. Mais detalhes sobre os próximos volumes serão divulgados nas redes sociais conforme a produção avançar.</p>
                 </div>
             </details>
-            <details class="faq-item reveal" name="faq" style="--d:.36s">
+            <details class="faq-item" name="faq" style="--n:5">
                 <summary class="faq-q">
                     <span class="faq-q-text">Como posso acompanhar as novidades?</span>
                     <span class="faq-icon" aria-hidden="true"></span>
@@ -657,11 +701,12 @@
             </div>
             <nav class="footer-col footer-col--nav" aria-label="Navegação do rodapé">
                 <a href="#home">Início</a>
+                <a href="#historia">A História</a>
                 <a href="#capa">A Capa</a>
-                <a href="#lancamento">Lançamento</a>
-                <a href="#autor">Autor</a>
+                <a href="#lancamento">Edição</a>
+                <a href="#errawyn">Erráwyn</a>
                 <a href="#faq">FAQ</a>
-                <a href="https://odmcwiki.mhformagini.com.br/" target="_blank" rel="noopener">Wiki de Erráwyn</a>
+                <a href="https://odmcwiki.mhformagini.com.br/" target="_blank" rel="noopener">Wiki da Ordem</a>
             </nav>
             <div class="footer-col footer-col--social">
                 <span class="eyebrow">Siga a saga</span>
