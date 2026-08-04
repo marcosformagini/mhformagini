@@ -1219,7 +1219,6 @@ body::after {
    card só para os fragmentos da pintura. */
 .quotes {
     list-style: none;
-    max-width: 58rem;
     border-top: 1px solid rgba(158, 43, 34, 0.28);
 }
 
@@ -1242,8 +1241,15 @@ body::after {
     background: linear-gradient(90deg, rgba(158, 43, 34, 0.055), transparent 68%);
 }
 
-/* Aspas monumentais na margem, como as da seção do autor */
-.quote-row figure { position: relative; }
+/* A linha ocupa a largura toda: a citação toma a folga que sobrar e a
+   assinatura fica colada na margem direita, rente ao fim do texto. */
+.quote-row figure {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: clamp(1.4rem, 1rem + 2vw, 3.5rem);
+    align-items: end;
+}
 .quote-row figure::before {
     content: '\201C';
     position: absolute;
@@ -1264,18 +1270,17 @@ body::after {
     font-size: clamp(1.1rem, 0.98rem + 0.75vw, 1.55rem);
     line-height: 1.62;
     color: var(--ink);
-    max-width: 44ch;
 }
 .quote-row blockquote p + p { margin-top: 1rem; }
 
-/* Assinatura recuada à direita, com o filete que cresce no hover */
+/* Assinatura na margem direita, com o filete que cresce no hover */
 .quote-row figcaption {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
     justify-content: flex-end;
     gap: 0.3rem 0.9rem;
-    margin-top: clamp(1.1rem, 0.9rem + 0.6vw, 1.6rem);
+    padding-bottom: 0.35rem;
 }
 .quote-row figcaption::before {
     content: '';
@@ -1284,6 +1289,8 @@ body::after {
     margin-right: 0.3rem;
     background: var(--accent-dark);
     opacity: 0.5;
+    /* Ancorado na direita: cresce para a folga, à esquerda. Ancorado na
+       esquerda, ele avançaria por cima do nome. */
     transform-origin: right;
     transition: scale 0.5s var(--ease-out), opacity 0.5s ease;
 }
@@ -1311,10 +1318,17 @@ body::after {
     border-bottom-color: rgba(158, 43, 34, 0.5);
 }
 
+@media (max-width: 860px) {
+    .quote-row figure {
+        grid-template-columns: minmax(0, 1fr);
+        gap: clamp(1.1rem, 0.9rem + 0.6vw, 1.6rem);
+    }
+    .quote-row figcaption { justify-content: flex-start; padding-bottom: 0; }
+    .quote-row figcaption::before { display: none; }
+}
 @media (max-width: 700px) {
     .quote-row { padding-left: 1.9rem; padding-right: 0; }
     .quote-row figure::before { left: -1.5rem; top: -1.1rem; }
-    .quote-row figcaption { justify-content: flex-start; }
     .quote-row figcaption::before { display: none; }
 }
 
@@ -1972,7 +1986,7 @@ a.hero-badge:hover {
 /* --- A revelação: capa + conversa --- */
 .capa-layout {
     display: grid;
-    grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
     gap: clamp(2.5rem, 1rem + 5vw, 5rem);
     align-items: start;
 }
@@ -2038,12 +2052,52 @@ a.hero-badge:hover {
     color: var(--text);
 }
 
-/* Citação da quarta capa */
+/* A sinopse da quarta capa: fechada mostra só o fecho; abre no
+   hover/foco. Os parágrafos ficam sempre no DOM (e no leitor de tela);
+   o que muda é a faixa de grade que os comporta — 0fr → 1fr anima,
+   `height: auto` não animaria em todo lugar. */
 .capa-quote {
+    position: relative;
     padding-left: 1.6rem;
     border-left: 2px solid rgba(217,88,75,0.55);
-    max-width: 44ch;
+    max-width: 54ch;
+    transition: border-color 0.5s ease;
 }
+.capa-quote:hover,
+.capa-quote:focus-visible { border-left-color: var(--accent); }
+.capa-quote:focus-visible { outline-offset: 6px; }
+
+.capa-synopsis {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.65s var(--ease-out);
+}
+.capa-synopsis > div { overflow: hidden; min-height: 0; }
+.capa-quote:hover .capa-synopsis,
+.capa-quote:focus-visible .capa-synopsis,
+.capa-quote:focus-within .capa-synopsis { grid-template-rows: 1fr; }
+
+/* As reticências no fim do trecho denunciam que há mais texto;
+   somem quando a sinopse abre (ali o fecho é mesmo o fim). */
+.capa-synopsis-hook::after {
+    content: '\2002\2026';
+    font-style: normal;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--accent-dark);
+    opacity: 0.7;
+    transition: opacity 0.4s ease;
+}
+.capa-quote:hover .capa-synopsis-hook::after,
+.capa-quote:focus-visible .capa-synopsis-hook::after,
+.capa-quote:focus-within .capa-synopsis-hook::after { opacity: 0; }
+
+/* Sem hover (toque) a sinopse já nasce aberta */
+@media (hover: none) {
+    .capa-synopsis { grid-template-rows: 1fr; }
+    .capa-synopsis-hook::after { content: none; }
+}
+
 .capa-quote p {
     font-style: italic;
     font-size: clamp(1.05rem, 0.98rem + 0.6vw, 1.3rem);
@@ -2051,6 +2105,15 @@ a.hero-badge:hover {
     color: var(--text);
     margin-bottom: 0.8rem;
 }
+/* Os parágrafos abertos são corpo de texto; o fecho segue como a
+   frase de efeito, maior, fechando a leitura. */
+.capa-synopsis p {
+    font-size: clamp(0.92rem, 0.88rem + 0.22vw, 1.02rem);
+    line-height: 1.85;
+    color: var(--ink-2);
+}
+.capa-synopsis p:last-child { margin-bottom: 1.1rem; }
+.capa-synopsis-hook { margin-bottom: 0.6rem; }
 .capa-quote cite {
     font-family: var(--font-display);
     font-size: 0.62rem;
@@ -2330,7 +2393,7 @@ a.hero-badge:hover {
 
 @media (max-width: 880px) {
     .capa-layout { grid-template-columns: 1fr; gap: 3rem; }
-    .capa-frame  { max-width: 340px; width: 100%; }
+    .capa-frame  { max-width: 300px; width: 100%; }
     .plates      { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
