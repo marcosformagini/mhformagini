@@ -2012,15 +2012,6 @@ a.hero-badge:hover {
     box-shadow: 0 6px 20px rgba(0,0,0,0.4);
 }
 .capa-tag svg { width: 0.72rem; height: 0.72rem; color: var(--accent); }
-.capa-frame figcaption {
-    margin-top: 1.2rem;
-    font-family: var(--font-display);
-    font-size: 0.62rem;
-    font-weight: 600;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--text-muted);
-}
 
 .capa-side { display: flex; flex-direction: column; gap: 1.6rem; }
 
@@ -2252,17 +2243,7 @@ a.hero-badge:hover {
     .frag { max-width: 480px; }
 }
 
-/* Nota sobre a pintura */
-.capa-note {
-    font-size: 0.88rem;
-    font-style: italic;
-    line-height: 1.8;
-    color: var(--ink-3);
-    max-width: 52ch;
-}
-
 /* Componentes da capa sobre o papel: tinta no lugar do vidro */
-.section--paper .capa-frame figcaption { color: var(--ink-3); }
 .section--paper .capa-credits {
     border-top-color: rgba(158,43,34,0.25);
     border-bottom-color: rgba(158,43,34,0.25);
