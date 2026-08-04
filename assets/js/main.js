@@ -387,7 +387,7 @@ createCanvasScene(
         els.forEach(s => obs.observe(s));
     };
     observe('#lancamento, #autor, #wiki', true);
-    observe('#home, #capa, #faq', false);
+    observe('#home, #capa, #leituras, #faq', false);
 })();
 
 /* ─────────────────────────────────────────
