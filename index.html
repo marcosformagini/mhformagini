@@ -52,7 +52,10 @@
 <!-- ===== NAV FLUTUANTE ===== -->
 <nav id="mainNavbar" class="floating-nav" role="navigation" aria-label="Navegação principal">
     <div class="floating-nav-inner">
-        <a class="nav-brand" href="#home" aria-label="Início">M.&#8202;H.&#8202;Formagini</a>
+        <a class="nav-brand" href="#home" aria-label="Início">
+            <span class="nav-brand-mark" aria-hidden="true">◆</span>
+            <span class="nav-brand-name">M.&#8202;H.&#8202;Formagini</span>
+        </a>
         <ul class="nav-links" id="navLinks" role="list">
             <li><a href="#home"       class="nav-link active">Início</a></li>
             <li><a href="#capa"       class="nav-link nav-link--new">A Capa</a></li>
@@ -147,7 +150,13 @@
 <!-- ===== A CAPA =====
      A pintura de Tiago Sousa é o FUNDO da seção: cinza no repouso,
      ganha cor quando o mouse entra na seção (scrub de rolagem no toque). -->
-<section id="capa" class="section section--paper">
+<section id="capa" class="section section--paper section--railed">
+    <div class="sec-rail" aria-hidden="true">
+        <span class="sec-rail-mark">◆</span>
+        <span class="sec-rail-name">A Capa</span>
+        <span class="sec-rail-rule"></span>
+        <span class="sec-rail-num">001</span>
+    </div>
     <div class="capa-bg" aria-hidden="true">
         <img class="capa-bg-gray"
              src="assets/img/capa/arte-cinza-1200.webp"
@@ -334,7 +343,13 @@
 </section>
 
 <!-- ===== LANÇAMENTO ===== -->
-<section id="lancamento" class="section section--light">
+<section id="lancamento" class="section section--light section--railed">
+    <div class="sec-rail" aria-hidden="true">
+        <span class="sec-rail-mark">◆</span>
+        <span class="sec-rail-name">Lançamento</span>
+        <span class="sec-rail-rule"></span>
+        <span class="sec-rail-num">002</span>
+    </div>
     <div class="section-inner">
         <header class="sec-head reveal">
             <div class="sec-meta">
@@ -471,7 +486,13 @@
 </section>
 
 <!-- ===== AUTOR ===== -->
-<section id="autor" class="section section--alt">
+<section id="autor" class="section section--alt section--railed">
+    <div class="sec-rail" aria-hidden="true">
+        <span class="sec-rail-mark">◆</span>
+        <span class="sec-rail-name">O Autor</span>
+        <span class="sec-rail-rule"></span>
+        <span class="sec-rail-num">003</span>
+    </div>
     <canvas id="particles-canvas" aria-hidden="true"></canvas>
     <div class="section-inner">
         <div class="author-layout">
@@ -526,7 +547,13 @@
 </section>
 
 <!-- ===== WIKI ===== -->
-<section id="wiki" class="section section--dark">
+<section id="wiki" class="section section--dark section--railed">
+    <div class="sec-rail" aria-hidden="true">
+        <span class="sec-rail-mark">◆</span>
+        <span class="sec-rail-name">A Wiki</span>
+        <span class="sec-rail-rule"></span>
+        <span class="sec-rail-num">004</span>
+    </div>
     <div class="section-inner">
         <header class="sec-head reveal">
             <div class="sec-meta">
@@ -601,7 +628,13 @@
 </section>
 
 <!-- ===== FAQ ===== -->
-<section id="faq" class="section section--paper">
+<section id="faq" class="section section--paper section--railed">
+    <div class="sec-rail" aria-hidden="true">
+        <span class="sec-rail-mark">◆</span>
+        <span class="sec-rail-name">Dúvidas</span>
+        <span class="sec-rail-rule"></span>
+        <span class="sec-rail-num">005</span>
+    </div>
     <canvas id="faq-canvas" aria-hidden="true"></canvas>
     <div class="section-inner faq-inner">
         <header class="sec-head reveal">

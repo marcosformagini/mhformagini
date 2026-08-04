@@ -91,6 +91,34 @@ const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 })();
 
 /* ─────────────────────────────────────────
+   TRILHO CARMESIM DAS SEÇÕES
+   Observador próprio: o trilho tem a altura inteira da seção, então
+   threshold 0.1 poderia nunca ser atingido em seções muito longas.
+───────────────────────────────────────── */
+(function () {
+    const rails = document.querySelectorAll('.sec-rail');
+    if (!rails.length) return;
+    if (REDUCED) {
+        rails.forEach(r => r.classList.add('active'));
+        return;
+    }
+    // Observa a SEÇÃO, não o trilho: o trilho nasce com clip-path zerando
+    // sua área visível, e nesse estado o IntersectionObserver pode nunca
+    // considerá-lo visível.
+    const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+            if (!e.isIntersecting) return;
+            e.target.querySelector('.sec-rail')?.classList.add('active');
+            obs.unobserve(e.target);
+        });
+    }, { threshold: 0, rootMargin: '0px 0px -12% 0px' });
+    rails.forEach(r => {
+        const sec = r.closest('.section--railed');
+        if (sec) obs.observe(sec);
+    });
+})();
+
+/* ─────────────────────────────────────────
    HERO — IGNIÇÃO DO SUBTÍTULO (letra a letra)
 ───────────────────────────────────────── */
 (function () {

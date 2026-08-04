@@ -228,6 +228,9 @@ body::after {
 }
 
 .nav-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
     font-family: var(--font-title);
     font-size: 1.05rem;
     font-weight: 700;
@@ -239,6 +242,18 @@ body::after {
     transition: color 0.3s ease;
 }
 .nav-brand:hover { color: var(--accent-light); }
+/* Losango heráldico da marca — o mesmo sinal do rodapé e dos trilhos */
+.nav-brand-mark {
+    font-family: var(--font-body);
+    font-size: 0.52rem;
+    line-height: 1;
+    color: var(--accent-dark);
+    transition: transform 0.55s var(--ease-out), color 0.3s ease;
+}
+.nav-brand:hover .nav-brand-mark {
+    transform: rotate(90deg);
+    color: var(--accent);
+}
 
 .nav-links {
     display: flex;
@@ -754,6 +769,97 @@ body::after {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 var(--space-gutter);
+}
+
+/* ===== TRILHO CARMESIM DE SEÇÃO =====
+   A lombada do livro na borda esquerda: uma faixa de sangue com o nome
+   da seção na vertical. Só nas seções internas — o hero fica limpo.
+   A seção ganha padding-left do tamanho do trilho para o conteúdo não
+   passar por baixo dele. */
+.section--railed {
+    --rail-w: clamp(38px, 5vw, 74px);
+    padding-left: var(--rail-w);
+}
+
+.sec-rail {
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: var(--rail-w);
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(0.85rem, 0.6rem + 0.6vw, 1.4rem);
+    padding: clamp(2.2rem, 1.6rem + 2vw, 4rem) 0;
+    background: linear-gradient(180deg,
+        var(--accent-dark) 0%,
+        var(--crimson)    38%,
+        #45100B          100%);
+    box-shadow:
+        inset -1px 0 0 rgba(240, 237, 230, 0.10),
+        6px 0 26px rgba(20, 19, 18, 0.20);
+    pointer-events: none;
+    overflow: hidden;
+    /* Persiana: o trilho desce do topo quando a seção entra em cena */
+    clip-path: inset(0 0 100% 0);
+    transition: clip-path 1.1s var(--ease-out);
+}
+.sec-rail.active { clip-path: inset(0 0 0 0); }
+
+/* Cada peça do trilho entra logo atrás da persiana */
+.sec-rail > * {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition:
+        opacity   0.7s ease            var(--rd, 0.35s),
+        transform 0.7s var(--ease-out) var(--rd, 0.35s);
+}
+.sec-rail.active > * { opacity: 1; transform: none; }
+.sec-rail-mark { --rd: 0.30s; }
+.sec-rail-name { --rd: 0.42s; }
+.sec-rail-rule { --rd: 0.54s; }
+.sec-rail-num  { --rd: 0.62s; }
+
+.sec-rail-mark {
+    font-family: var(--font-body);
+    font-size: 0.5rem;
+    line-height: 1;
+    color: rgba(243, 238, 230, 0.85);
+}
+.sec-rail-name {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    font-family: var(--font-display);
+    font-size: clamp(0.6rem, 0.5rem + 0.34vw, 0.86rem);
+    font-weight: 600;
+    letter-spacing: clamp(3px, 0.35vw, 6px);
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: #F3EEE6;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.32);
+}
+.sec-rail-rule {
+    flex: 0 0 clamp(26px, 5vh, 54px);
+    width: 1px;
+    background: linear-gradient(180deg, rgba(243, 238, 230, 0.5), transparent);
+}
+.sec-rail-num {
+    writing-mode: vertical-rl;
+    font-family: var(--font-display);
+    font-size: 0.56rem;
+    font-weight: 600;
+    letter-spacing: 3px;
+    color: rgba(243, 238, 230, 0.55);
+}
+
+/* Sem JS o trilho nasce pronto */
+.no-js .sec-rail { clip-path: none; }
+.no-js .sec-rail > * { opacity: 1; transform: none; }
+
+@media (max-width: 640px) {
+    .section--railed { --rail-w: 30px; }
+    .sec-rail { padding-top: 1.7rem; gap: 0.7rem; }
+    .sec-rail-num { display: none; }
 }
 
 /* ===== CABEÇALHO EDITORIAL DE SEÇÃO ===== */
@@ -1666,6 +1772,8 @@ body::after {
         transition-duration: 0.01ms !important;
     }
     .rise, .reveal { opacity: 1; transform: none; }
+    .sec-rail { clip-path: none; }
+    .sec-rail > * { opacity: 1; transform: none; }
     .hero-title {
         animation: none;
         opacity: 1;
@@ -1911,47 +2019,129 @@ a.hero-badge:hover {
     }
 }
 
-/* --- Detalhes da obra: fragmentos rasgados da pintura --- */
+/* --- Detalhes da obra: fragmentos emoldurados da pintura --- */
 .frags {
     list-style: none;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: clamp(1.6rem, 1rem + 2vw, 2.6rem);
-    align-items: start;
+    align-items: stretch;
     margin-bottom: 1rem;
 }
+
+/* O card: lâmina de papel com moldura carmesim.
+   A transição repete as linhas de .reveal (com o delay --d) porque
+   redeclarar `transition` aqui apagaria o stagger da entrada; o hover
+   usa `translate`, que compõe com o `transform` do reveal sem brigar. */
+.frag {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: clamp(0.75rem, 0.6rem + 0.5vw, 1.05rem);
+    padding-bottom: clamp(1.3rem, 1rem + 0.8vw, 1.8rem);
+    background: linear-gradient(158deg,
+        rgba(244, 241, 235, 0.78),
+        rgba(210, 202, 187, 0.42));
+    border: 1px solid rgba(158, 43, 34, 0.26);
+    border-radius: var(--radius);
+    box-shadow: 0 12px 28px rgba(20, 19, 18, 0.10);
+    transition:
+        opacity      0.85s var(--ease-out) var(--d, 0s),
+        transform    0.85s var(--ease-out) var(--d, 0s),
+        translate    0.55s var(--ease-out),
+        border-color 0.55s ease,
+        box-shadow   0.55s ease,
+        background   0.55s ease;
+}
+.frag:hover,
+.frag:focus-within {
+    translate: 0 -8px;
+    border-color: rgba(158, 43, 34, 0.45);
+    box-shadow: 0 24px 46px rgba(20, 19, 18, 0.18);
+    background: linear-gradient(158deg,
+        rgba(248, 246, 241, 0.9),
+        rgba(210, 202, 187, 0.5));
+}
+
+/* Cantoneiras que se assentam nos cantos ao passar o mouse */
+.frag::before,
+.frag::after {
+    content: '';
+    position: absolute;
+    width: 20px; height: 20px;
+    border: 1px solid var(--accent-dark);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease, translate 0.5s var(--ease-out);
+}
+.frag::before {
+    top: 7px; left: 7px;
+    border-right: 0; border-bottom: 0;
+    border-radius: 7px 0 0 0;
+    translate: 5px 5px;
+}
+.frag::after {
+    bottom: 7px; right: 7px;
+    border-left: 0; border-top: 0;
+    border-radius: 0 0 7px 0;
+    translate: -5px -5px;
+}
+.frag:hover::before, .frag:focus-within::before,
+.frag:hover::after,  .frag:focus-within::after {
+    opacity: 0.8;
+    translate: 0 0;
+}
+
+/* O fragmento continua rasgado (PNG com alfa): nada de clipe retangular,
+   só a sombra que o descola do card e um zoom lento no hover. */
 .frag .zoom img {
     width: 100%; height: auto;
-    filter: drop-shadow(0 16px 26px rgba(20, 19, 18, 0.32));
-    transition: transform 0.4s var(--ease-out), filter 0.4s ease;
+    filter: drop-shadow(0 14px 22px rgba(20, 19, 18, 0.28));
+    transition: transform 0.7s var(--ease-out), filter 0.7s ease;
 }
-/* Cada fragmento preso na folha com uma leve torção própria */
-.frag:nth-child(1) .zoom img { transform: rotate(-1.2deg); }
-.frag:nth-child(2) .zoom img { transform: rotate(0.9deg); }
-.frag:nth-child(3) .zoom img { transform: rotate(-0.7deg); }
-.frag .zoom:hover img,
-.frag .zoom:focus-visible img {
-    transform: rotate(0deg) scale(1.03);
-    filter: drop-shadow(0 24px 38px rgba(20, 19, 18, 0.4));
+.frag:hover .zoom img,
+.frag:focus-within .zoom img {
+    transform: scale(1.04);
+    filter: drop-shadow(0 20px 34px rgba(20, 19, 18, 0.38));
 }
+
 .frag h3 {
+    position: relative;
     font-family: var(--font-display);
     font-size: 0.82rem;
     font-weight: 700;
     letter-spacing: 2.5px;
     text-transform: uppercase;
     color: var(--accent-dark);
-    margin: 1.2rem 0 0.5rem;
+    margin: 1.15rem 0 0.55rem;
+    padding-top: 0.95rem;
 }
+/* Filete acima do título que se estica no hover */
+.frag h3::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 26px; height: 1px;
+    background: var(--accent-dark);
+    opacity: 0.5;
+    transform-origin: left;
+    transition: scale 0.55s var(--ease-out), opacity 0.55s ease;
+}
+.frag:hover h3::before,
+.frag:focus-within h3::before {
+    scale: 2.6 1;
+    opacity: 0.9;
+}
+
 .frag p {
     font-size: 0.92rem;
     line-height: 1.8;
     color: var(--ink-2);
-    max-width: 40ch;
+    margin-bottom: 0;
 }
 
 @media (max-width: 880px) {
-    .frags { grid-template-columns: 1fr; gap: 2.8rem; }
+    .frags { grid-template-columns: 1fr; gap: 2.2rem; }
     .frag { max-width: 480px; }
 }
 
@@ -2094,7 +2284,11 @@ a.hero-badge:hover {
     max-width: 100%;
     max-height: calc(100svh - 9rem);
     object-fit: contain;
+    border: 1px solid rgba(217, 88, 75, 0.32);
     border-radius: var(--radius-sm);
+    box-shadow:
+        0 30px 80px rgba(0, 0, 0, 0.6),
+        0 0 0 6px rgba(20, 19, 18, 0.55);
     transform: scale(0.98);
     transition: transform 0.35s var(--ease-out);
 }
@@ -2138,4 +2332,7 @@ body.lightbox-open { overflow: hidden; }
     .capa-bg-color { animation: none; opacity: 0; }
     .lightbox-figure img { transform: none; }
     .nav-link--new::before { box-shadow: none; }
+    .frag:hover, .frag:focus-within { translate: none; }
+    .frag:hover .zoom img, .frag:focus-within .zoom img { transform: none; }
+    .frag::before, .frag::after { translate: none; }
 }
