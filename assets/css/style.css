@@ -738,6 +738,13 @@ body::after {
     background: rgba(158,43,34,0.07);
 }
 
+/* ===== CHAVE GERAL DA LOJA =====
+   Enquanto o <html> estiver com data-loja="off", nada marcado como
+   .loja-only entra na página: sem caixa, sem foco, sem leitor de tela,
+   e — de propósito — sem contar na numeração das seções mais abaixo.
+   Ligar a venda é trocar off por on no index.html. */
+[data-loja="off"] .loja-only { display: none !important; }
+
 /* ===== SEÇÕES ===== */
 .section {
     position: relative;
@@ -845,6 +852,12 @@ body::after {
     width: 1px;
     background: linear-gradient(180deg, rgba(243, 238, 230, 0.5), transparent);
 }
+/* O número do trilho é um contador, não um texto fixo: seção escondida
+   (display:none) não incrementa, então ligar ou desligar a loja renumera
+   as seções sozinho, sem buraco na sequência. */
+body { counter-reset: sec; }
+.section--railed { counter-increment: sec; }
+
 .sec-rail-num {
     writing-mode: vertical-rl;
     font-family: var(--font-display);
@@ -853,6 +866,7 @@ body::after {
     letter-spacing: 3px;
     color: rgba(243, 238, 230, 0.55);
 }
+.sec-rail-num::after { content: '0' counter(sec, decimal-leading-zero); }
 
 /* Sem JS o trilho nasce pronto */
 .no-js .sec-rail { clip-path: none; }
@@ -1211,6 +1225,200 @@ body::after {
     font-size: 0.85rem;
     color: var(--ink-2);
     line-height: 1.7;
+}
+
+/* ===== COMPRAR — a vitrine dos pacotes =====
+   Nanquim entre duas seções claras: o bloco comercial ganha peso próprio
+   e o carmesim dos botões acende contra o escuro. Molduras discretas —
+   o vocabulário de card fica reservado, o que manda aqui é a tipografia. */
+.packs {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.4rem;
+    margin-top: 2.8rem;
+}
+.pack {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+    padding: 2.1rem 1.7rem 1.8rem;
+    background: rgba(240, 237, 230, 0.035);
+    border: 1px solid rgba(217, 88, 75, 0.20);
+    border-radius: var(--radius);
+    transition:
+        border-color 0.3s ease,
+        background   0.3s ease,
+        translate    0.35s var(--ease-out);
+}
+.pack:hover {
+    border-color: rgba(217, 88, 75, 0.45);
+    background: rgba(240, 237, 230, 0.06);
+    translate: 0 -4px;
+}
+
+/* O do meio: o que a maioria leva */
+.pack--featured {
+    border-color: rgba(217, 88, 75, 0.55);
+    background: rgba(217, 88, 75, 0.07);
+    box-shadow: 0 12px 40px rgba(110, 26, 20, 0.28);
+}
+.pack--featured:hover { border-color: var(--accent); }
+
+/* Selo pendurado na borda de cima */
+.pack-flag {
+    position: absolute;
+    top: 0; left: 1.7rem;
+    translate: 0 -50%;
+    padding: 0.3rem 0.85rem;
+    font-family: var(--font-display);
+    font-size: 0.56rem;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--paper);
+    background: var(--accent-dark);
+    border-radius: 50px;
+    white-space: nowrap;
+}
+.pack-flag--rare {
+    color: var(--accent-light);
+    background: var(--dark);
+    border: 1px solid rgba(217, 88, 75, 0.5);
+}
+
+.pack-name {
+    font-size: clamp(1.5rem, 1.2rem + 1vw, 1.95rem);
+    color: var(--text);
+    letter-spacing: 0.5px;
+}
+.pack-sub {
+    margin-top: 0.35rem;
+    font-size: 0.82rem;
+    font-style: italic;
+    line-height: 1.6;
+    color: var(--text-2);
+}
+
+.pack-price {
+    font-family: var(--font-display);
+    font-size: clamp(2.1rem, 1.6rem + 1.8vw, 2.8rem);
+    font-weight: 600;
+    line-height: 1;
+    color: var(--accent-light);
+    letter-spacing: 1px;
+}
+.pack-cur {
+    font-size: 0.42em;
+    letter-spacing: 2px;
+    margin-right: 0.25rem;
+    vertical-align: 0.42em;
+    color: var(--text-2);
+}
+.pack-note {
+    display: block;
+    margin-top: 0.5rem;
+    font-family: var(--font-display);
+    font-size: 0.58rem;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+/* O que vem na caixa — losango heráldico no lugar do bullet */
+.pack-items {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    padding-top: 1.15rem;
+    border-top: 1px solid rgba(217, 88, 75, 0.22);
+}
+.pack-items li {
+    position: relative;
+    padding-left: 1.4rem;
+    font-size: 0.86rem;
+    line-height: 1.65;
+    color: var(--text-2);
+}
+.pack-items li::before {
+    content: '◆';
+    position: absolute;
+    left: 0; top: 0.15em;
+    font-family: var(--font-body);
+    font-size: 0.5rem;
+    color: var(--accent);
+}
+
+/* Botão colado no rodapé do pacote, alinhado entre colunas de altura diferente */
+.pack-cta {
+    margin-top: auto;
+    justify-content: center;
+    text-align: center;
+}
+.pack .btn-ghost {
+    color: var(--text);
+    border-color: rgba(217, 88, 75, 0.45);
+}
+.pack .btn-ghost:hover {
+    color: var(--paper);
+    border-color: var(--accent);
+    background: rgba(217, 88, 75, 0.16);
+}
+
+.buy-notes {
+    margin-top: 2rem;
+    text-align: center;
+    font-size: 0.78rem;
+    line-height: 1.9;
+    color: var(--text-muted);
+}
+
+/* O ebook não passa pela loja — mora na Amazon */
+.ebook-strip {
+    margin-top: 2.6rem;
+    padding: 1.5rem 1.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    border: 1px dashed rgba(217, 88, 75, 0.4);
+    border-radius: var(--radius);
+    background: rgba(217, 88, 75, 0.05);
+    transition: border-style 0.3s ease, background 0.3s ease;
+}
+.ebook-strip:hover { border-style: solid; background: rgba(217, 88, 75, 0.09); }
+.ebook-strip h3 {
+    font-size: 1.15rem;
+    color: var(--text);
+    margin-bottom: 0.35rem;
+}
+.ebook-strip p {
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: var(--text-2);
+}
+.ebook-strip .btn-ghost {
+    flex-shrink: 0;
+    color: var(--text);
+    border-color: rgba(217, 88, 75, 0.45);
+}
+.ebook-strip .btn-ghost:hover {
+    color: var(--paper);
+    border-color: var(--accent);
+    background: rgba(217, 88, 75, 0.16);
+}
+
+@media (max-width: 880px) {
+    .packs { grid-template-columns: 1fr; max-width: 30rem; margin-inline: auto; }
+    .pack--featured { order: -1; }
+    .ebook-strip { flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 600px) {
+    .pack { padding: 2rem 1.35rem 1.6rem; }
+    .pack-flag { left: 1.35rem; }
 }
 
 /* ===== LEITURAS — a página de elogios =====

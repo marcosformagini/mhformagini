@@ -1,5 +1,13 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="no-js">
+<!--
+  data-loja: chave geral da venda.
+  "off" = toda a estrutura de loja (seção #comprar, links de nav e rodapé)
+          fica fora da página. Nada renderiza, nada entra na numeração das seções.
+  "on"  = libera tudo. É a única coisa que precisa mudar para a loja ir ao ar,
+          depois que os preços e as URLs da Nuvemshop estiverem preenchidos.
+  Passo a passo da Nuvemshop: docs/loja-nuvemshop.md
+-->
+<html lang="pt-BR" class="no-js" data-loja="off">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -60,6 +68,7 @@
             <li><a href="#home"       class="nav-link active">Início</a></li>
             <li><a href="#capa"       class="nav-link nav-link--new">A Capa</a></li>
             <li><a href="#lancamento" class="nav-link">Lançamento</a></li>
+            <li class="loja-only"><a href="#comprar" class="nav-link">Comprar</a></li>
             <li><a href="#leituras"   class="nav-link">Leituras</a></li>
             <li><a href="#autor"      class="nav-link">Autor</a></li>
             <li><a href="#wiki"       class="nav-link">Wiki</a></li>
@@ -156,7 +165,7 @@
         <span class="sec-rail-mark">◆</span>
         <span class="sec-rail-name">A Capa</span>
         <span class="sec-rail-rule"></span>
-        <span class="sec-rail-num">001</span>
+        <span class="sec-rail-num"></span>
     </div>
     <div class="capa-bg" aria-hidden="true">
         <img class="capa-bg-gray"
@@ -352,7 +361,7 @@
         <span class="sec-rail-mark">◆</span>
         <span class="sec-rail-name">Lançamento</span>
         <span class="sec-rail-rule"></span>
-        <span class="sec-rail-num">002</span>
+        <span class="sec-rail-num"></span>
     </div>
     <div class="section-inner">
         <header class="sec-head reveal">
@@ -489,13 +498,128 @@
     </div>
 </section>
 
+<!-- ===== COMPRAR — os pacotes da edição impressa =====
+     ESTRUTURA PRONTA E DESLIGADA. Só aparece com <html data-loja="on">.
+     Antes de ligar, trocar TODO comentário "TROCAR:" por dado real:
+       · preço de cada pacote
+       · href de cada botão = URL do produto na Nuvemshop
+       · href do ebook = URL da página do livro na Amazon
+       · prazo de envio
+     Um pacote novo é uma cópia de um <li class="pack"> inteiro. -->
+<section id="comprar" class="section section--alt section--railed loja-only">
+    <div class="sec-rail" aria-hidden="true">
+        <span class="sec-rail-mark">◆</span>
+        <span class="sec-rail-name">Comprar</span>
+        <span class="sec-rail-rule"></span>
+        <span class="sec-rail-num"></span>
+    </div>
+    <div class="section-inner">
+        <header class="sec-head reveal">
+            <div class="sec-meta">
+                <span class="sec-label">Edição Definitiva · Impressa</span>
+                <span class="sec-line" aria-hidden="true"></span>
+            </div>
+            <h2 class="sec-title">Leve a saga <em>para a sua estante</em></h2>
+        </header>
+
+        <p class="text-body text-lead reveal" style="--d:.06s">
+            Três formas de começar. O mesmo livro no centro de todas —
+            o que muda é o que vem <b>junto dele</b>.
+        </p>
+
+        <ul class="packs" role="list">
+
+            <!-- PACOTE 1 — o básico -->
+            <li class="pack reveal" style="--d:.10s">
+                <header class="pack-head">
+                    <h3 class="pack-name">Volume Avulso</h3>
+                    <p class="pack-sub">O livro, e nada além dele.</p>
+                </header>
+                <p class="pack-price">
+                    <!-- TROCAR: preço do pacote 1 -->
+                    <span class="pack-cur">R$</span>00,00
+                    <span class="pack-note">à vista no Pix</span>
+                </p>
+                <ul class="pack-items" role="list">
+                    <li>Sombras da Guerra — Edição Definitiva</li>
+                    <li>Capa dura, com os capítulos inéditos</li>
+                    <li>Marcador de página impresso</li>
+                </ul>
+                <!-- TROCAR: href = URL do produto na Nuvemshop -->
+                <a class="btn-ghost pack-cta" href="#">Comprar</a>
+            </li>
+
+            <!-- PACOTE 2 — o destaque -->
+            <li class="pack pack--featured reveal" style="--d:.16s">
+                <span class="pack-flag">Mais escolhido</span>
+                <header class="pack-head">
+                    <h3 class="pack-name">Kit do Cartógrafo</h3>
+                    <p class="pack-sub">Para quem quer o mundo, não só a história.</p>
+                </header>
+                <p class="pack-price">
+                    <!-- TROCAR: preço do pacote 2 -->
+                    <span class="pack-cur">R$</span>00,00
+                    <span class="pack-note">à vista no Pix</span>
+                </p>
+                <ul class="pack-items" role="list">
+                    <li>Tudo do Volume Avulso</li>
+                    <li>Mapa de Erráwyn impresso, em papel envelhecido</li>
+                    <li>Card com a arte de capa de Tiago Sousa</li>
+                    <li>Marcador exclusivo do kit</li>
+                </ul>
+                <!-- TROCAR: href = URL do produto na Nuvemshop -->
+                <a class="btn-capsule pack-cta" href="#">Comprar</a>
+            </li>
+
+            <!-- PACOTE 3 — o topo -->
+            <li class="pack reveal" style="--d:.22s">
+                <span class="pack-flag pack-flag--rare">Edição limitada</span>
+                <header class="pack-head">
+                    <h3 class="pack-name">Edição do Escriba</h3>
+                    <p class="pack-sub">Numerada, assinada, entregue em caixa.</p>
+                </header>
+                <p class="pack-price">
+                    <!-- TROCAR: preço do pacote 3 -->
+                    <span class="pack-cur">R$</span>00,00
+                    <span class="pack-note">à vista no Pix</span>
+                </p>
+                <ul class="pack-items" role="list">
+                    <li>Tudo do Kit do Cartógrafo</li>
+                    <li>Exemplar assinado, com dedicatória à mão</li>
+                    <li>Pôster da pintura de capa</li>
+                    <li>Carta selada do autor</li>
+                    <li>Caixa de colecionador, numerada</li>
+                </ul>
+                <!-- TROCAR: href = URL do produto na Nuvemshop -->
+                <a class="btn-ghost pack-cta" href="#">Comprar</a>
+            </li>
+        </ul>
+
+        <p class="buy-notes reveal" style="--d:.28s">
+            Pix, cartão em até 12x ou boleto · Frete calculado no carrinho, para todo o Brasil ·
+            <!-- TROCAR: prazo real de expedição -->
+            Envio em até 0 dias úteis após a confirmação do pagamento
+        </p>
+
+        <!-- Ebook não passa pela loja: mora na Amazon -->
+        <aside class="ebook-strip reveal" style="--d:.34s">
+            <div class="ebook-strip-text">
+                <h3>Prefere ler na tela?</h3>
+                <p>A Edição Definitiva também sai em ebook, na Amazon — Kindle e app de leitura.</p>
+            </div>
+            <!-- TROCAR: href = URL do livro na Amazon -->
+            <a class="btn-ghost" href="#" target="_blank" rel="noopener">Ver na Amazon</a>
+        </aside>
+    </div>
+</section>
+
 <!-- ===== LEITURAS — o que dizem da obra ===== -->
 <section id="leituras" class="section section--paper section--railed">
     <div class="sec-rail" aria-hidden="true">
         <span class="sec-rail-mark">◆</span>
         <span class="sec-rail-name">Leituras</span>
         <span class="sec-rail-rule"></span>
-        <span class="sec-rail-num">003</span>
+        <span class="sec-rail-num"></span>
     </div>
     <div class="section-inner">
         <header class="sec-head reveal">
@@ -562,7 +686,7 @@
         <span class="sec-rail-mark">◆</span>
         <span class="sec-rail-name">O Autor</span>
         <span class="sec-rail-rule"></span>
-        <span class="sec-rail-num">004</span>
+        <span class="sec-rail-num"></span>
     </div>
     <canvas id="particles-canvas" aria-hidden="true"></canvas>
     <div class="section-inner">
@@ -623,7 +747,7 @@
         <span class="sec-rail-mark">◆</span>
         <span class="sec-rail-name">A Wiki</span>
         <span class="sec-rail-rule"></span>
-        <span class="sec-rail-num">005</span>
+        <span class="sec-rail-num"></span>
     </div>
     <div class="section-inner">
         <header class="sec-head reveal">
@@ -704,7 +828,7 @@
         <span class="sec-rail-mark">◆</span>
         <span class="sec-rail-name">Dúvidas</span>
         <span class="sec-rail-rule"></span>
-        <span class="sec-rail-num">006</span>
+        <span class="sec-rail-num"></span>
     </div>
     <canvas id="faq-canvas" aria-hidden="true"></canvas>
     <div class="section-inner faq-inner">
@@ -795,6 +919,7 @@
                 <a href="#home">Início</a>
                 <a href="#capa">A Capa</a>
                 <a href="#lancamento">Lançamento</a>
+                <a href="#comprar" class="loja-only">Comprar</a>
                 <a href="#leituras">Leituras</a>
                 <a href="#autor">Autor</a>
                 <a href="#faq">FAQ</a>
