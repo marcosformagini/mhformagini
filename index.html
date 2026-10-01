@@ -11,8 +11,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M. H. Formagini — Autor de Fantasia</title>
-    <meta name="description" content="M. H. Formagini — autor de Fantasia Épica e Alta Fantasia. Criador do universo de Erráwyn e das Crônicas Méssias. A pré-venda da Edição Definitiva de Sombras da Guerra abre em 19.10.2026.">
+    <title>M. H. Formagini — Sombras da Guerra, livro de fantasia épica</title>
+    <meta name="description" content="Site oficial de M. H. Formagini, autor de Sombras da Guerra (Crônicas Méssias, Volume I), fantasia épica brasileira no universo de Erráwyn. Pré-venda da Edição Definitiva de 19.10 a 18.11.2026.">
+    <meta name="author" content="M. H. Formagini">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="alternate" hreflang="pt-BR" href="https://mhformagini.com.br/">
     <link rel="canonical" href="https://mhformagini.com.br/">
     <meta name="theme-color" content="#0D0D0D">
     <meta property="og:title" content="M. H. Formagini | Autor de Fantasia">
@@ -43,14 +46,54 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "Person",
-      "name": "M. H. Formagini",
-      "url": "https://mhformagini.com.br/",
-      "jobTitle": "Autor de Fantasia Épica",
-      "sameAs": [
-        "https://www.instagram.com/mhformagini",
-        "https://www.tiktok.com/@mhformagini",
-        "https://www.threads.com/@mhformagini"
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://mhformagini.com.br/#site",
+          "url": "https://mhformagini.com.br/",
+          "name": "M. H. Formagini",
+          "inLanguage": "pt-BR",
+          "publisher": { "@id": "https://mhformagini.com.br/#autor" }
+        },
+        {
+          "@type": "Person",
+          "@id": "https://mhformagini.com.br/#autor",
+          "name": "M. H. Formagini",
+          "url": "https://mhformagini.com.br/",
+          "image": "https://mhformagini.com.br/assets/img/perfil-480.webp",
+          "jobTitle": "Escritor de fantasia épica",
+          "description": "Autor brasileiro de fantasia épica, criador do universo de Erráwyn e das Crônicas Méssias.",
+          "nationality": { "@type": "Country", "name": "Brasil" },
+          "knowsAbout": ["Fantasia épica", "Alta fantasia", "Erráwyn", "Crônicas Méssias"],
+          "sameAs": [
+            "https://www.instagram.com/mhformagini",
+            "https://www.tiktok.com/@mhformagini",
+            "https://www.threads.com/@mhformagini"
+          ]
+        },
+        {
+          "@type": "BookSeries",
+          "@id": "https://mhformagini.com.br/#cronicas-messias",
+          "name": "Crônicas Méssias",
+          "author": { "@id": "https://mhformagini.com.br/#autor" },
+          "inLanguage": "pt-BR"
+        },
+        {
+          "@type": "Book",
+          "@id": "https://mhformagini.com.br/#sombras-da-guerra",
+          "name": "Sombras da Guerra",
+          "alternateName": "Sombras da Guerra: Sangue do Império",
+          "bookEdition": "Edição Definitiva",
+          "author": { "@id": "https://mhformagini.com.br/#autor" },
+          "illustrator": { "@type": "Person", "name": "Tiago Sousa" },
+          "isPartOf": { "@id": "https://mhformagini.com.br/#cronicas-messias" },
+          "position": 1,
+          "genre": ["Fantasia épica", "Alta fantasia"],
+          "inLanguage": "pt-BR",
+          "image": "https://mhformagini.com.br/assets/img/capa/sdg-capa-1200.webp",
+          "url": "https://mhformagini.com.br/",
+          "description": "Volume I das Crônicas Méssias. O Imperador Magno Bravo sangra devagar em Sangueforte, enquanto Sally, aprendiz de espiã, atravessa terras devastadas carregando segredos que podem salvar o império ou destruí-lo de vez."
+        }
       ]
     }
     </script>
